@@ -170,7 +170,7 @@ def ptable(dataframe,h=None):
     """Render a DataFrame as a Plotly dark-themed table"""
     hdr=list(dataframe.columns);vals=[dataframe[c].astype(str).tolist() for c in dataframe.columns]
     fig=go.Figure(go.Table(header=dict(values=[f"<b>{c}</b>" for c in hdr],fill_color="rgba(45,32,15,.6)",font=dict(color="#d4a853",size=12,family="Bricolage Grotesque"),align="left",line=dict(color="rgba(80,65,40,.3)",width=1)),cells=dict(values=vals,fill_color="rgba(22,19,15,.88)",font=dict(color="#c4b99a",size=11,family="Plus Jakarta Sans"),align="left",line=dict(color="rgba(80,65,40,.15)",width=1),height=30)))
-    fig.update_layout(**DK,height=h or min(56+len(dataframe)*32,600),margin=dict(l=0,r=0,t=0,b=0))
+    fig.update_layout(template="plotly_dark",paper_bgcolor="rgba(0,0,0,0)",plot_bgcolor="rgba(18,15,12,.5)",font=dict(family="Plus Jakarta Sans",color="#c4b99a",size=11),height=h or min(56+len(dataframe)*32,600),margin=dict(l=0,r=0,t=0,b=0))
     st.plotly_chart(fig,use_container_width=True,config=PCFG)
 
 PAGES=["🏠 Home & Overview","🔬 ML Pipeline & Flowcharts","📊 Dataset & Cleaning","📉 EDA & Statistics",
@@ -527,7 +527,8 @@ elif page=="🔗 Association Rules":
             with tab:
                 shdr(f"Top-20 Rules: {label} Group",col);r=mine(da[da["app_use_likelihood"]==label])
                 if len(r)>0:
-                    ptable(r)
+                    _rd=r.copy();_rd["Support"]=_rd["Support"].round(3);_rd["Confidence"]=_rd["Confidence"].round(3);_rd["Lift"]=_rd["Lift"].round(2)
+                    ptable(_rd)
                     fig=px.scatter(r,x="Confidence",y="Lift",size="Support",color="Lift",color_continuous_scale="YlOrBr",hover_data=["Rule"],size_max=20);fig.update_layout(**DK,height=380);st.plotly_chart(fig,use_container_width=True,config=PCFG)
                     if len(r)>0:insight("🔗",f"Strongest {label} Rule",r.iloc[0]["Rule"],f"Conf: {r.iloc[0]['Confidence']:.0%} · Lift: {r.iloc[0]['Lift']:.2f}",col)
         with tabs[3]:
