@@ -3,8 +3,7 @@
 Dataset: 2,000 Indian dog owners · Realistic distribution: Yes 20% · Maybe 38% · No 42%
 20 ML models · 40+ metrics · Comprehensive flowcharts with embedded scores
 """
-import streamlit as st, pandas as pd, numpy as np, warnings, io, os
-import streamlit.components.v1 as components
+import streamlit as st, pandas as pd, numpy as np, warnings, io
 warnings.filterwarnings("ignore")
 st.set_page_config(page_title="DogNap Analytics", page_icon="🐾", layout="wide", initial_sidebar_state="expanded")
 
@@ -129,30 +128,157 @@ with st.sidebar:
 import plotly.graph_objects as go, plotly.express as px
 
 if page=="🚀 Landing Page":
-    _lp=os.path.join(os.path.dirname(os.path.abspath(__file__)),"index.html")
-    with open(_lp,"r",encoding="utf-8") as _f:_lhtml=_f.read()
-    # Patch "Launch Dashboard" links to switch to Home page via Streamlit
-    _lhtml=_lhtml.replace(
-        '</body>',
-        """<style>
-        /* Hide default streamlit padding when landing page is active */
-        </style>
-        <script>
-        // Intercept CTA clicks to navigate within Streamlit
-        document.querySelectorAll('a[href="#cta"], a[href="#"]').forEach(function(a){
-            if(a.textContent.trim().includes('Launch Dashboard') || a.textContent.trim().includes('Explore Dashboard')){
-                a.removeAttribute('href');
-                a.style.cursor='pointer';
-                a.addEventListener('click',function(e){
-                    e.preventDefault();
-                    window.parent.postMessage({type:'streamlit:setComponentValue',value:'launch'},'*');
-                });
-            }
-        });
-        </script>
-        </body>"""
-    )
-    components.html(_lhtml,height=2400,scrolling=True)
+    # Full-width landing page rendered natively in Streamlit
+    st.markdown("""<style>
+    @keyframes lp-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    @keyframes lp-pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.5);opacity:0}}
+    .lp-hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:rgba(212,168,83,.08);border:1px solid rgba(212,168,83,.15);margin-bottom:28px}
+    .lp-hero-badge .lp-dot{position:relative;display:inline-flex;width:8px;height:8px}
+    .lp-hero-badge .lp-dot::before{content:'';position:absolute;width:100%;height:100%;border-radius:50%;background:#7cb67c;animation:lp-pulse 2s cubic-bezier(0,0,.2,1) infinite}
+    .lp-hero-badge .lp-dot::after{content:'';position:relative;display:inline-flex;width:8px;height:8px;border-radius:50%;background:#7cb67c}
+    .lp-hero-badge span.lp-badge-text{color:#d4a853;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+    .lp-heading{font-family:'Bricolage Grotesque',sans-serif!important;font-weight:800!important;color:#ede4d3!important;font-size:clamp(2.2rem,5.5vw,4rem)!important;line-height:1.08!important;letter-spacing:-0.03em!important;margin:0 0 20px!important}
+    .lp-heading .lp-grad{background:linear-gradient(135deg,#d4a853 0%,#9b7cb6 60%,#5bb8c4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .lp-sub{color:#c4b99a;font-size:17px;line-height:1.7;max-width:540px;margin-bottom:32px}
+    .lp-cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:20px}
+    .lp-cta{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:16px;font-weight:700;font-size:15px;text-decoration:none;cursor:pointer;transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1)}
+    .lp-cta-primary{background:linear-gradient(135deg,#a07d3a,#9b7cb6);color:#ede4d3;box-shadow:0 4px 24px rgba(212,168,83,.2),0 12px 48px rgba(155,124,182,.1)}
+    .lp-cta-primary:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 8px 36px rgba(212,168,83,.3),0 20px 56px rgba(155,124,182,.15)}
+    .lp-cta-secondary{color:#c4b99a;border:1px solid rgba(80,65,40,.35);background:transparent}
+    .lp-cta-secondary:hover{transform:translateY(-2px);border-color:rgba(212,168,83,.4);color:#ede4d3}
+    .lp-float-card{padding:20px;border-radius:16px;background:rgba(22,19,15,.92);border:1px solid rgba(80,65,40,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),0 2px 8px rgba(212,168,83,.06)}
+    .lp-float-card .lp-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;font-family:'Bricolage Grotesque',sans-serif}
+    .lp-float-card .lp-val{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;color:#ede4d3;font-size:28px;letter-spacing:-0.02em}
+    .lp-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;padding:40px 0}
+    .lp-stat-num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(2rem,4vw,3rem);letter-spacing:-0.02em}
+    .lp-stat-label{color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px}
+    .lp-section-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+    .lp-section-title{font-family:'Bricolage Grotesque',sans-serif!important;font-weight:800!important;color:#ede4d3!important;font-size:clamp(1.6rem,3.5vw,2.4rem)!important;letter-spacing:-0.03em!important;line-height:1.15!important;margin-bottom:12px!important}
+    .lp-section-sub{color:#c4b99a;font-size:15px;line-height:1.7;max-width:520px}
+    .lp-features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-top:32px}
+    .lp-feat-card{padding:24px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1)}
+    .lp-feat-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 8px 32px rgba(212,168,83,.08),0 16px 48px rgba(0,0,0,.25)}
+    .lp-feat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:20px}
+    .lp-feat-card h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;color:#ede4d3;font-size:16px;margin:0 0 8px}
+    .lp-feat-card p{color:#c4b99a;font-size:13px;line-height:1.7;margin:0}
+    .lp-step{display:flex;gap:16px;margin-bottom:20px}
+    .lp-step-num{flex-shrink:0;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:14px}
+    .lp-step h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;color:#ede4d3;margin:0 0 4px;font-size:15px}
+    .lp-step p{color:#c4b99a;font-size:13px;line-height:1.7;margin:0}
+    .lp-mockup{padding:28px;border-radius:20px;background:rgba(22,19,15,.85);border:1px solid rgba(80,65,40,.25);box-shadow:0 8px 40px rgba(0,0,0,.4),0 2px 12px rgba(212,168,83,.04)}
+    .lp-mockup-dots{display:flex;gap:6px;margin-bottom:20px}
+    .lp-mockup-dots span{width:12px;height:12px;border-radius:50%}
+    .lp-mockup-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+    .lp-mockup-metric{padding:12px;border-radius:10px;background:rgba(15,13,11,.6);border:1px solid rgba(80,65,40,.15)}
+    .lp-mockup-metric .mm-label{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;font-family:'Bricolage Grotesque',sans-serif}
+    .lp-mockup-metric .mm-val{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;color:#ede4d3;font-size:17px}
+    .lp-chart-bars{height:140px;border-radius:10px;background:rgba(15,13,11,.6);border:1px solid rgba(80,65,40,.15);display:flex;align-items:flex-end;gap:6px;padding:14px}
+    .lp-chart-bars .lp-bar{flex:1;border-radius:4px 4px 0 0}
+    .lp-cta-box{text-align:center;padding:48px 32px;border-radius:20px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.25);box-shadow:0 8px 48px rgba(0,0,0,.4);position:relative;overflow:hidden}
+    .lp-cta-box::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(212,168,83,.06) 0%,transparent 60%);pointer-events:none}
+    .lp-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:32px 0;border-top:1px solid rgba(80,65,40,.12);margin-top:40px}
+    .lp-footer-brand{display:flex;align-items:center;gap:10px}
+    .lp-footer-brand .lp-flogo{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#a07d3a,#9b7cb6);font-size:14px}
+    @media(max-width:768px){.lp-stats-grid{grid-template-columns:repeat(2,1fr);gap:16px}.lp-features-grid{grid-template-columns:1fr}.lp-footer{flex-direction:column;text-align:center}}
+    </style>
+
+    <!-- HERO -->
+    <div style="padding:20px 0 40px">
+      <div class="lp-hero-badge"><span class="lp-dot"></span><span class="lp-badge-text">20 ML Models &middot; 2,000 Dog Owners Analyzed</span></div>
+      <h1 class="lp-heading">Pet Care Market<br><span class="lp-grad">Intelligence</span><br>Dashboard</h1>
+      <p class="lp-sub">Decode Indian pet care spending patterns, predict app adoption, and uncover regional insights with comprehensive ML-powered analytics.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Floating metric cards row
+    fc1,fc2,fc3=st.columns(3)
+    with fc1:
+        st.markdown("""<div class="lp-float-card" style="animation:lp-float 6s ease-in-out infinite"><div class="lp-label" style="color:#d4a853">Avg Monthly Spend</div><div class="lp-val">₹14,847</div><div style="margin-top:6px"><span style="color:#7cb67c;font-size:12px;font-weight:700">+12.3%</span> <span style="color:#5a5040;font-size:11px">vs last quarter</span></div></div>""",unsafe_allow_html=True)
+    with fc2:
+        st.markdown("""<div class="lp-float-card" style="animation:lp-float 5s ease-in-out infinite;animation-delay:-2s"><div class="lp-label" style="color:#9b7cb6">App Adoption Rate</div><div class="lp-val">58.2%</div><div style="margin-top:10px;width:100%;height:6px;border-radius:99px;background:rgba(155,124,182,.15)"><div style="height:100%;width:58%;border-radius:99px;background:linear-gradient(90deg,#9b7cb6,#5bb8c4)"></div></div></div>""",unsafe_allow_html=True)
+    with fc3:
+        st.markdown("""<div class="lp-float-card" style="animation:lp-float 4s ease-in-out infinite;animation-delay:-1s"><div class="lp-label" style="color:#7cb67c">Regions Covered</div><div class="lp-val">5</div><div style="margin-top:8px;display:flex;gap:4px"><span style="background:rgba(124,182,124,.12);color:#7cb67c;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">North</span><span style="background:rgba(91,184,196,.12);color:#5bb8c4;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">South</span><span style="background:rgba(196,112,75,.12);color:#c4704b;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">East</span></div></div>""",unsafe_allow_html=True)
+
+    # Stats bar
+    st.markdown("<div style='height:20px'></div>",unsafe_allow_html=True)
+    st.divider()
+    st.markdown("""<div class="lp-stats-grid">
+      <div><div class="lp-stat-num">2,000</div><div class="lp-stat-label">Dog Owners Surveyed</div></div>
+      <div><div class="lp-stat-num">20</div><div class="lp-stat-label">ML Models Trained</div></div>
+      <div><div class="lp-stat-num">40+</div><div class="lp-stat-label">Metrics Tracked</div></div>
+      <div><div class="lp-stat-num">5</div><div class="lp-stat-label">Indian Regions</div></div>
+    </div>""",unsafe_allow_html=True)
+    st.divider()
+
+    # Features section
+    st.markdown("""<div style="text-align:center;padding:40px 0 0">
+      <div class="lp-section-badge" style="background:rgba(155,124,182,.08);border:1px solid rgba(155,124,182,.15);color:#9b7cb6">Platform Features</div>
+      <h2 class="lp-section-title" style="margin-left:auto!important;margin-right:auto!important">Everything you need for <span style="color:#d4a853">pet market analysis</span></h2>
+      <p class="lp-section-sub" style="margin-left:auto;margin-right:auto">From spending prediction to regional segmentation, DogNap provides end-to-end intelligence for the Indian pet care market.</p>
+    </div>
+    <div class="lp-features-grid">
+      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(212,168,83,.15),rgba(212,168,83,.05));box-shadow:0 4px 16px rgba(212,168,83,.08)">🔮</div><h4>Spending Prediction</h4><p>ML models predict monthly pet care expenditure using demographics, ownership history, and service usage patterns.</p></div>
+      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(155,124,182,.15),rgba(155,124,182,.05));box-shadow:0 4px 16px rgba(155,124,182,.08)">📊</div><h4>Regional Analytics</h4><p>Deep-dive into North, South, East, West, and Central India with region-specific spending and adoption heatmaps.</p></div>
+      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(91,184,196,.15),rgba(91,184,196,.05));box-shadow:0 4px 16px rgba(91,184,196,.08)">🚀</div><h4>App Adoption Modeling</h4><p>Classify users as Yes, Maybe, or No for app adoption using 20 trained models with comprehensive performance metrics.</p></div>
+      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(124,182,124,.15),rgba(124,182,124,.05));box-shadow:0 4px 16px rgba(124,182,124,.08)">📈</div><h4>Interactive Visualizations</h4><p>Plotly-powered charts with dark theme, drill-down capability, and real-time filtering across all dimensions.</p></div>
+      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(196,112,75,.15),rgba(196,112,75,.05));box-shadow:0 4px 16px rgba(196,112,75,.08)">🎯</div><h4>Demographic Segmentation</h4><p>Segment owners by age group, ownership years, number of dogs, and service usage for targeted marketing strategies.</p></div>
+      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(201,169,78,.15),rgba(201,169,78,.05));box-shadow:0 4px 16px rgba(201,169,78,.08)">📥</div><h4>Export &amp; Reports</h4><p>Download comprehensive data exports and model performance reports for offline analysis and stakeholder presentations.</p></div>
+    </div>""",unsafe_allow_html=True)
+
+    st.markdown("<div style='height:40px'></div>",unsafe_allow_html=True)
+    st.divider()
+
+    # How it works section
+    lc1,lc2=st.columns([1,1])
+    with lc1:
+        st.markdown("""<div style="padding:20px 0">
+          <div class="lp-section-badge" style="background:rgba(91,184,196,.08);border:1px solid rgba(91,184,196,.15);color:#5bb8c4">How It Works</div>
+          <h2 class="lp-section-title">From raw data to <span style="color:#d4a853">actionable insights</span></h2>
+          <div style="margin-top:24px">
+            <div class="lp-step"><div class="lp-step-num" style="background:linear-gradient(135deg,rgba(212,168,83,.15),rgba(212,168,83,.05));color:#d4a853;border:1px solid rgba(212,168,83,.2)">1</div><div><h4>Data Collection</h4><p>Survey data from 2,000 Indian dog owners across 5 regions with realistic demographic distributions.</p></div></div>
+            <div class="lp-step"><div class="lp-step-num" style="background:linear-gradient(135deg,rgba(155,124,182,.15),rgba(155,124,182,.05));color:#9b7cb6;border:1px solid rgba(155,124,182,.2)">2</div><div><h4>Model Training</h4><p>20 ML models including Random Forest, XGBoost, SVM, and Neural Networks trained with cross-validation.</p></div></div>
+            <div class="lp-step"><div class="lp-step-num" style="background:linear-gradient(135deg,rgba(91,184,196,.15),rgba(91,184,196,.05));color:#5bb8c4;border:1px solid rgba(91,184,196,.2)">3</div><div><h4>Insight Generation</h4><p>Interactive dashboard surfaces spending patterns, adoption drivers, and segment-level recommendations.</p></div></div>
+          </div>
+        </div>""",unsafe_allow_html=True)
+    with lc2:
+        st.markdown("""<div class="lp-mockup">
+          <div class="lp-mockup-dots"><span style="background:#c4704b"></span><span style="background:#d4a853"></span><span style="background:#7cb67c"></span></div>
+          <div class="lp-mockup-metrics">
+            <div class="lp-mockup-metric"><div class="mm-label" style="color:#d4a853">Revenue</div><div class="mm-val">₹29.7M</div></div>
+            <div class="lp-mockup-metric"><div class="mm-label" style="color:#9b7cb6">Users</div><div class="mm-val">1,164</div></div>
+            <div class="lp-mockup-metric"><div class="mm-label" style="color:#7cb67c">Accuracy</div><div class="mm-val">94.2%</div></div>
+          </div>
+          <div class="lp-chart-bars">
+            <div class="lp-bar" style="height:45%;background:linear-gradient(to top,rgba(212,168,83,.6),rgba(212,168,83,.2))"></div>
+            <div class="lp-bar" style="height:72%;background:linear-gradient(to top,rgba(155,124,182,.6),rgba(155,124,182,.2))"></div>
+            <div class="lp-bar" style="height:58%;background:linear-gradient(to top,rgba(91,184,196,.6),rgba(91,184,196,.2))"></div>
+            <div class="lp-bar" style="height:88%;background:linear-gradient(to top,rgba(124,182,124,.6),rgba(124,182,124,.2))"></div>
+            <div class="lp-bar" style="height:65%;background:linear-gradient(to top,rgba(196,112,75,.6),rgba(196,112,75,.2))"></div>
+            <div class="lp-bar" style="height:78%;background:linear-gradient(to top,rgba(212,168,83,.6),rgba(212,168,83,.2))"></div>
+            <div class="lp-bar" style="height:52%;background:linear-gradient(to top,rgba(155,124,182,.6),rgba(155,124,182,.2))"></div>
+            <div class="lp-bar" style="height:90%;background:linear-gradient(to top,rgba(91,184,196,.6),rgba(91,184,196,.2))"></div>
+            <div class="lp-bar" style="height:40%;background:linear-gradient(to top,rgba(124,182,124,.6),rgba(124,182,124,.2))"></div>
+            <div class="lp-bar" style="height:68%;background:linear-gradient(to top,rgba(196,112,75,.6),rgba(196,112,75,.2))"></div>
+          </div>
+        </div>""",unsafe_allow_html=True)
+
+    st.markdown("<div style='height:40px'></div>",unsafe_allow_html=True)
+
+    # CTA section
+    st.markdown("""<div class="lp-cta-box">
+      <div style="position:relative">
+        <h2 class="lp-section-title" style="margin-left:auto!important;margin-right:auto!important">Ready to decode the<br>pet care market?</h2>
+        <p class="lp-section-sub" style="margin:0 auto 28px;text-align:center">Launch the DogNap dashboard and start exploring ML-powered insights from 2,000 Indian dog owners.</p>
+        <div style="text-align:center"><span style="display:inline-block;padding:14px 32px;border-radius:16px;background:linear-gradient(135deg,#a07d3a,#9b7cb6);color:#ede4d3;font-weight:700;font-size:17px;box-shadow:0 4px 24px rgba(212,168,83,.25),0 16px 56px rgba(155,124,182,.12);letter-spacing:.01em">🐾&nbsp; Explore Dashboard →</span></div>
+      </div>
+    </div>""",unsafe_allow_html=True)
+
+    # Footer
+    st.markdown("""<div class="lp-footer">
+      <div class="lp-footer-brand"><div class="lp-flogo">🐾</div><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;color:#ede4d3">DogNap</span></div>
+      <span style="color:#5a5040;font-size:13px">Pet Care Market Intelligence Dashboard &middot; 2,000 owners &middot; 20 ML models</span>
+      <span style="color:#5a5040;font-size:11px">&copy; 2026 DogNap Analytics</span>
+    </div>""",unsafe_allow_html=True)
 
 elif page=="🏠 Home & Overview":
     phdr("🐾","DogNap — Pet Care Market Intelligence",f"{len(df):,} Indian Dog Owners · Realistic 20/38/42 Distribution · 20 ML Models")
