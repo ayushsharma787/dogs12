@@ -3,7 +3,8 @@
 Dataset: 2,000 Indian dog owners · Realistic distribution: Yes 20% · Maybe 38% · No 42%
 20 ML models · 40+ metrics · Comprehensive flowcharts with embedded scores
 """
-import streamlit as st, pandas as pd, numpy as np, warnings, io
+import streamlit as st, pandas as pd, numpy as np, warnings, io, os
+import streamlit.components.v1 as components
 warnings.filterwarnings("ignore")
 st.set_page_config(page_title="DogNap Analytics", page_icon="🐾", layout="wide", initial_sidebar_state="expanded")
 
@@ -117,7 +118,7 @@ def eng(df):
     d=pd.get_dummies(d,columns=["region"],drop_first=True,dtype=int);return d
 df_raw=load_data();dfe=eng(df_raw);df=df_raw.dropna()
 
-PAGES=["🏠 Home & Overview","🔬 ML Pipeline & Flowcharts","📊 Dataset & Cleaning","📉 EDA & Statistics",
+PAGES=["🚀 Landing Page","🏠 Home & Overview","🔬 ML Pipeline & Flowcharts","📊 Dataset & Cleaning","📉 EDA & Statistics",
        "🎯 Classification Models","🔮 Clustering Analysis","🔗 Association Rules",
        "📈 Regression Models","⚔️ Model Comparison","📋 Summary & Takeaways","📥 Download Center"]
 with st.sidebar:
@@ -127,7 +128,33 @@ with st.sidebar:
 
 import plotly.graph_objects as go, plotly.express as px
 
-if page=="🏠 Home & Overview":
+if page=="🚀 Landing Page":
+    _lp=os.path.join(os.path.dirname(os.path.abspath(__file__)),"index.html")
+    with open(_lp,"r",encoding="utf-8") as _f:_lhtml=_f.read()
+    # Patch "Launch Dashboard" links to switch to Home page via Streamlit
+    _lhtml=_lhtml.replace(
+        '</body>',
+        """<style>
+        /* Hide default streamlit padding when landing page is active */
+        </style>
+        <script>
+        // Intercept CTA clicks to navigate within Streamlit
+        document.querySelectorAll('a[href="#cta"], a[href="#"]').forEach(function(a){
+            if(a.textContent.trim().includes('Launch Dashboard') || a.textContent.trim().includes('Explore Dashboard')){
+                a.removeAttribute('href');
+                a.style.cursor='pointer';
+                a.addEventListener('click',function(e){
+                    e.preventDefault();
+                    window.parent.postMessage({type:'streamlit:setComponentValue',value:'launch'},'*');
+                });
+            }
+        });
+        </script>
+        </body>"""
+    )
+    components.html(_lhtml,height=2400,scrolling=True)
+
+elif page=="🏠 Home & Overview":
     phdr("🐾","DogNap — Pet Care Market Intelligence",f"{len(df):,} Indian Dog Owners · Realistic 20/38/42 Distribution · 20 ML Models")
     st.markdown(f"""<div style="background:linear-gradient(135deg,rgba(45,32,15,.2),rgba(15,12,10,.9));border:1px solid rgba(160,125,58,.2);border-radius:14px;padding:20px 24px;margin-bottom:20px"><div style="color:#d4a853;font-size:13px;font-weight:700;margin-bottom:8px;font-family:Bricolage Grotesque">🎯 The Central Question</div><div style="color:#c4b99a;font-size:14px;line-height:1.7">Can we predict pet-care app adoption from owner demographics and behaviour? With a <b style="color:#c4704b">realistic 20% YES rate</b> (not the fantasy 74%), models must actually <em>learn</em> to distinguish adopters from non-adopters.</div></div>""",unsafe_allow_html=True)
     yes_n=len(df[df["app_use_likelihood"]=="Yes"]);maybe_n=len(df[df["app_use_likelihood"]=="Maybe"]);no_n=len(df[df["app_use_likelihood"]=="No"])
