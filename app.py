@@ -117,7 +117,7 @@ def eng(df):
     d=pd.get_dummies(d,columns=["region"],drop_first=True,dtype=int);return d
 df_raw=load_data();dfe=eng(df_raw);df=df_raw.dropna()
 
-PAGES=["🚀 Landing Page","🏠 Home & Overview","🔬 ML Pipeline & Flowcharts","📊 Dataset & Cleaning","📉 EDA & Statistics",
+PAGES=["🏠 Home & Overview","🔬 ML Pipeline & Flowcharts","📊 Dataset & Cleaning","📉 EDA & Statistics",
        "🎯 Classification Models","🔮 Clustering Analysis","🔗 Association Rules",
        "📈 Regression Models","⚔️ Model Comparison","📋 Summary & Takeaways","📥 Download Center"]
 with st.sidebar:
@@ -127,180 +127,60 @@ with st.sidebar:
 
 import plotly.graph_objects as go, plotly.express as px
 
-if page=="🚀 Landing Page":
-    # Full-width landing page rendered natively in Streamlit
-    st.markdown("""<style>
-    @keyframes lp-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-    @keyframes lp-pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.5);opacity:0}}
-    .lp-hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:rgba(212,168,83,.08);border:1px solid rgba(212,168,83,.15);margin-bottom:28px}
-    .lp-hero-badge .lp-dot{position:relative;display:inline-flex;width:8px;height:8px}
-    .lp-hero-badge .lp-dot::before{content:'';position:absolute;width:100%;height:100%;border-radius:50%;background:#7cb67c;animation:lp-pulse 2s cubic-bezier(0,0,.2,1) infinite}
-    .lp-hero-badge .lp-dot::after{content:'';position:relative;display:inline-flex;width:8px;height:8px;border-radius:50%;background:#7cb67c}
-    .lp-hero-badge span.lp-badge-text{color:#d4a853;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-    .lp-heading{font-family:'Bricolage Grotesque',sans-serif!important;font-weight:800!important;color:#ede4d3!important;font-size:clamp(2.2rem,5.5vw,4rem)!important;line-height:1.08!important;letter-spacing:-0.03em!important;margin:0 0 20px!important}
-    .lp-heading .lp-grad{background:linear-gradient(135deg,#d4a853 0%,#9b7cb6 60%,#5bb8c4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .lp-sub{color:#c4b99a;font-size:17px;line-height:1.7;max-width:540px;margin-bottom:32px}
-    .lp-cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:20px}
-    .lp-cta{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:16px;font-weight:700;font-size:15px;text-decoration:none;cursor:pointer;transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1)}
-    .lp-cta-primary{background:linear-gradient(135deg,#a07d3a,#9b7cb6);color:#ede4d3;box-shadow:0 4px 24px rgba(212,168,83,.2),0 12px 48px rgba(155,124,182,.1)}
-    .lp-cta-primary:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 8px 36px rgba(212,168,83,.3),0 20px 56px rgba(155,124,182,.15)}
-    .lp-cta-secondary{color:#c4b99a;border:1px solid rgba(80,65,40,.35);background:transparent}
-    .lp-cta-secondary:hover{transform:translateY(-2px);border-color:rgba(212,168,83,.4);color:#ede4d3}
-    .lp-float-card{padding:20px;border-radius:16px;background:rgba(22,19,15,.92);border:1px solid rgba(80,65,40,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),0 2px 8px rgba(212,168,83,.06)}
-    .lp-float-card .lp-label{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;font-family:'Bricolage Grotesque',sans-serif}
-    .lp-float-card .lp-val{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;color:#ede4d3;font-size:28px;letter-spacing:-0.02em}
-    .lp-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;padding:40px 0}
-    .lp-stat-num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(2rem,4vw,3rem);letter-spacing:-0.02em}
-    .lp-stat-label{color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px}
-    .lp-section-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
-    .lp-section-title{font-family:'Bricolage Grotesque',sans-serif!important;font-weight:800!important;color:#ede4d3!important;font-size:clamp(1.6rem,3.5vw,2.4rem)!important;letter-spacing:-0.03em!important;line-height:1.15!important;margin-bottom:12px!important}
-    .lp-section-sub{color:#c4b99a;font-size:15px;line-height:1.7;max-width:520px}
-    .lp-features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-top:32px}
-    .lp-feat-card{padding:24px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1)}
-    .lp-feat-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 8px 32px rgba(212,168,83,.08),0 16px 48px rgba(0,0,0,.25)}
-    .lp-feat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:20px}
-    .lp-feat-card h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;color:#ede4d3;font-size:16px;margin:0 0 8px}
-    .lp-feat-card p{color:#c4b99a;font-size:13px;line-height:1.7;margin:0}
-    .lp-step{display:flex;gap:16px;margin-bottom:20px}
-    .lp-step-num{flex-shrink:0;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:14px}
-    .lp-step h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;color:#ede4d3;margin:0 0 4px;font-size:15px}
-    .lp-step p{color:#c4b99a;font-size:13px;line-height:1.7;margin:0}
-    .lp-mockup{padding:28px;border-radius:20px;background:rgba(22,19,15,.85);border:1px solid rgba(80,65,40,.25);box-shadow:0 8px 40px rgba(0,0,0,.4),0 2px 12px rgba(212,168,83,.04)}
-    .lp-mockup-dots{display:flex;gap:6px;margin-bottom:20px}
-    .lp-mockup-dots span{width:12px;height:12px;border-radius:50%}
-    .lp-mockup-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-    .lp-mockup-metric{padding:12px;border-radius:10px;background:rgba(15,13,11,.6);border:1px solid rgba(80,65,40,.15)}
-    .lp-mockup-metric .mm-label{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;font-family:'Bricolage Grotesque',sans-serif}
-    .lp-mockup-metric .mm-val{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;color:#ede4d3;font-size:17px}
-    .lp-chart-bars{height:140px;border-radius:10px;background:rgba(15,13,11,.6);border:1px solid rgba(80,65,40,.15);display:flex;align-items:flex-end;gap:6px;padding:14px}
-    .lp-chart-bars .lp-bar{flex:1;border-radius:4px 4px 0 0}
-    .lp-cta-box{text-align:center;padding:48px 32px;border-radius:20px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.25);box-shadow:0 8px 48px rgba(0,0,0,.4);position:relative;overflow:hidden}
-    .lp-cta-box::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(212,168,83,.06) 0%,transparent 60%);pointer-events:none}
-    .lp-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:32px 0;border-top:1px solid rgba(80,65,40,.12);margin-top:40px}
-    .lp-footer-brand{display:flex;align-items:center;gap:10px}
-    .lp-footer-brand .lp-flogo{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#a07d3a,#9b7cb6);font-size:14px}
-    @media(max-width:768px){.lp-stats-grid{grid-template-columns:repeat(2,1fr);gap:16px}.lp-features-grid{grid-template-columns:1fr}.lp-footer{flex-direction:column;text-align:center}}
-    </style>
 
-    <!-- HERO -->
-    <div style="padding:20px 0 40px">
-      <div class="lp-hero-badge"><span class="lp-dot"></span><span class="lp-badge-text">20 ML Models &middot; 2,000 Dog Owners Analyzed</span></div>
-      <h1 class="lp-heading">Pet Care Market<br><span class="lp-grad">Intelligence</span><br>Dashboard</h1>
-      <p class="lp-sub">Decode Indian pet care spending patterns, predict app adoption, and uncover regional insights with comprehensive ML-powered analytics.</p>
-    </div>
-    """, unsafe_allow_html=True)
+if page=="🏠 Home & Overview":
+    # === HERO SECTION with SVG Akita ===
+    AKITA_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="280" height="280"><defs><linearGradient id="fur1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#d4a853;stop-opacity:1"/><stop offset="100%" style="stop-color:#c4704b;stop-opacity:1"/></linearGradient><linearGradient id="fur2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ede4d3;stop-opacity:1"/><stop offset="100%" style="stop-color:#d4a853;stop-opacity:0.8"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#glow)"><path d="M120 80 L95 30 L85 35 L90 75 Q95 95 110 105 Z" fill="url(#fur1)" opacity="0.95"/><path d="M280 80 L305 30 L315 35 L310 75 Q305 95 290 105 Z" fill="url(#fur1)" opacity="0.95"/><ellipse cx="200" cy="160" rx="95" ry="85" fill="url(#fur1)"/><ellipse cx="200" cy="155" rx="80" ry="65" fill="url(#fur2)" opacity="0.3"/><path d="M140 135 Q130 115 115 120 Q105 130 120 145 Q130 155 145 150 Z" fill="#ede4d3" opacity="0.6"/><path d="M260 135 Q270 115 285 120 Q295 130 280 145 Q270 155 255 150 Z" fill="#ede4d3" opacity="0.6"/><circle cx="170" cy="145" r="12" fill="#0f0d0b"/><circle cx="230" cy="145" r="12" fill="#0f0d0b"/><circle cx="173" cy="142" r="4" fill="#ede4d3" opacity="0.9"/><circle cx="233" cy="142" r="4" fill="#ede4d3" opacity="0.9"/><ellipse cx="200" cy="175" rx="14" ry="10" fill="#0f0d0b" opacity="0.85"/><path d="M190 182 Q200 192 210 182" stroke="#0f0d0b" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M160 130 Q175 118 200 115 Q225 118 240 130" stroke="#c4704b" stroke-width="2" fill="none" opacity="0.4"/><path d="M115 195 Q100 230 95 290 Q92 330 120 345 Q145 355 155 330 Q158 310 155 280 Q153 250 150 220 Z" fill="url(#fur1)" opacity="0.9"/><path d="M285 195 Q300 230 305 290 Q308 330 280 345 Q255 355 245 330 Q242 310 245 280 Q247 250 250 220 Z" fill="url(#fur1)" opacity="0.9"/><ellipse cx="200" cy="260" rx="75" ry="90" fill="url(#fur1)"/><path d="M160 220 Q200 200 240 220 Q250 260 240 300 Q200 320 160 300 Q150 260 160 220 Z" fill="url(#fur2)" opacity="0.25"/><path d="M155 330 Q160 365 170 380 Q175 388 165 390 Q150 390 148 380 Q142 365 140 345 Z" fill="url(#fur1)"/><path d="M245 330 Q240 365 230 380 Q225 388 235 390 Q250 390 252 380 Q258 365 260 345 Z" fill="url(#fur1)"/><path d="M275 250 Q310 260 330 280 Q345 300 355 340 Q360 360 340 365 Q320 365 315 350 Q305 320 290 300 Z" fill="url(#fur1)" opacity="0.85"/><ellipse cx="200" cy="390" rx="50" ry="8" fill="rgba(212,168,83,0.08)"/></g></svg>"""
 
-    # Floating metric cards row
-    fc1,fc2,fc3=st.columns(3)
-    with fc1:
-        st.markdown("""<div class="lp-float-card" style="animation:lp-float 6s ease-in-out infinite"><div class="lp-label" style="color:#d4a853">Avg Monthly Spend</div><div class="lp-val">₹14,847</div><div style="margin-top:6px"><span style="color:#7cb67c;font-size:12px;font-weight:700">+12.3%</span> <span style="color:#5a5040;font-size:11px">vs last quarter</span></div></div>""",unsafe_allow_html=True)
-    with fc2:
-        st.markdown("""<div class="lp-float-card" style="animation:lp-float 5s ease-in-out infinite;animation-delay:-2s"><div class="lp-label" style="color:#9b7cb6">App Adoption Rate</div><div class="lp-val">58.2%</div><div style="margin-top:10px;width:100%;height:6px;border-radius:99px;background:rgba(155,124,182,.15)"><div style="height:100%;width:58%;border-radius:99px;background:linear-gradient(90deg,#9b7cb6,#5bb8c4)"></div></div></div>""",unsafe_allow_html=True)
-    with fc3:
-        st.markdown("""<div class="lp-float-card" style="animation:lp-float 4s ease-in-out infinite;animation-delay:-1s"><div class="lp-label" style="color:#7cb67c">Regions Covered</div><div class="lp-val">5</div><div style="margin-top:8px;display:flex;gap:4px"><span style="background:rgba(124,182,124,.12);color:#7cb67c;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">North</span><span style="background:rgba(91,184,196,.12);color:#5bb8c4;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">South</span><span style="background:rgba(196,112,75,.12);color:#c4704b;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">East</span></div></div>""",unsafe_allow_html=True)
-
-    # Stats bar
-    st.markdown("<div style='height:20px'></div>",unsafe_allow_html=True)
-    st.divider()
-    st.markdown("""<div class="lp-stats-grid">
-      <div><div class="lp-stat-num">2,000</div><div class="lp-stat-label">Dog Owners Surveyed</div></div>
-      <div><div class="lp-stat-num">20</div><div class="lp-stat-label">ML Models Trained</div></div>
-      <div><div class="lp-stat-num">40+</div><div class="lp-stat-label">Metrics Tracked</div></div>
-      <div><div class="lp-stat-num">5</div><div class="lp-stat-label">Indian Regions</div></div>
-    </div>""",unsafe_allow_html=True)
-    st.divider()
-
-    # Features section
-    st.markdown("""<div style="text-align:center;padding:40px 0 0">
-      <div class="lp-section-badge" style="background:rgba(155,124,182,.08);border:1px solid rgba(155,124,182,.15);color:#9b7cb6">Platform Features</div>
-      <h2 class="lp-section-title" style="margin-left:auto!important;margin-right:auto!important">Everything you need for <span style="color:#d4a853">pet market analysis</span></h2>
-      <p class="lp-section-sub" style="margin-left:auto;margin-right:auto">From spending prediction to regional segmentation, DogNap provides end-to-end intelligence for the Indian pet care market.</p>
-    </div>
-    <div class="lp-features-grid">
-      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(212,168,83,.15),rgba(212,168,83,.05));box-shadow:0 4px 16px rgba(212,168,83,.08)">🔮</div><h4>Spending Prediction</h4><p>ML models predict monthly pet care expenditure using demographics, ownership history, and service usage patterns.</p></div>
-      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(155,124,182,.15),rgba(155,124,182,.05));box-shadow:0 4px 16px rgba(155,124,182,.08)">📊</div><h4>Regional Analytics</h4><p>Deep-dive into North, South, East, West, and Central India with region-specific spending and adoption heatmaps.</p></div>
-      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(91,184,196,.15),rgba(91,184,196,.05));box-shadow:0 4px 16px rgba(91,184,196,.08)">🚀</div><h4>App Adoption Modeling</h4><p>Classify users as Yes, Maybe, or No for app adoption using 20 trained models with comprehensive performance metrics.</p></div>
-      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(124,182,124,.15),rgba(124,182,124,.05));box-shadow:0 4px 16px rgba(124,182,124,.08)">📈</div><h4>Interactive Visualizations</h4><p>Plotly-powered charts with dark theme, drill-down capability, and real-time filtering across all dimensions.</p></div>
-      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(196,112,75,.15),rgba(196,112,75,.05));box-shadow:0 4px 16px rgba(196,112,75,.08)">🎯</div><h4>Demographic Segmentation</h4><p>Segment owners by age group, ownership years, number of dogs, and service usage for targeted marketing strategies.</p></div>
-      <div class="lp-feat-card"><div class="lp-feat-icon" style="background:linear-gradient(135deg,rgba(201,169,78,.15),rgba(201,169,78,.05));box-shadow:0 4px 16px rgba(201,169,78,.08)">📥</div><h4>Export &amp; Reports</h4><p>Download comprehensive data exports and model performance reports for offline analysis and stakeholder presentations.</p></div>
-    </div>""",unsafe_allow_html=True)
-
-    st.markdown("<div style='height:40px'></div>",unsafe_allow_html=True)
-    st.divider()
-
-    # How it works section
-    lc1,lc2=st.columns([1,1])
-    with lc1:
-        st.markdown("""<div style="padding:20px 0">
-          <div class="lp-section-badge" style="background:rgba(91,184,196,.08);border:1px solid rgba(91,184,196,.15);color:#5bb8c4">How It Works</div>
-          <h2 class="lp-section-title">From raw data to <span style="color:#d4a853">actionable insights</span></h2>
-          <div style="margin-top:24px">
-            <div class="lp-step"><div class="lp-step-num" style="background:linear-gradient(135deg,rgba(212,168,83,.15),rgba(212,168,83,.05));color:#d4a853;border:1px solid rgba(212,168,83,.2)">1</div><div><h4>Data Collection</h4><p>Survey data from 2,000 Indian dog owners across 5 regions with realistic demographic distributions.</p></div></div>
-            <div class="lp-step"><div class="lp-step-num" style="background:linear-gradient(135deg,rgba(155,124,182,.15),rgba(155,124,182,.05));color:#9b7cb6;border:1px solid rgba(155,124,182,.2)">2</div><div><h4>Model Training</h4><p>20 ML models including Random Forest, XGBoost, SVM, and Neural Networks trained with cross-validation.</p></div></div>
-            <div class="lp-step"><div class="lp-step-num" style="background:linear-gradient(135deg,rgba(91,184,196,.15),rgba(91,184,196,.05));color:#5bb8c4;border:1px solid rgba(91,184,196,.2)">3</div><div><h4>Insight Generation</h4><p>Interactive dashboard surfaces spending patterns, adoption drivers, and segment-level recommendations.</p></div></div>
+    hero_l, hero_r = st.columns([3, 2])
+    with hero_l:
+        st.markdown(f"""<div style="padding:10px 0 20px">
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:rgba(212,168,83,.08);border:1px solid rgba(212,168,83,.15);margin-bottom:24px">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7cb67c;box-shadow:0 0 6px rgba(124,182,124,.6)"></span>
+            <span style="color:#d4a853;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">20 ML Models &middot; {len(df):,} Dog Owners Analyzed</span>
           </div>
-        </div>""",unsafe_allow_html=True)
-    with lc2:
-        st.markdown("""<div class="lp-mockup">
-          <div class="lp-mockup-dots"><span style="background:#c4704b"></span><span style="background:#d4a853"></span><span style="background:#7cb67c"></span></div>
-          <div class="lp-mockup-metrics">
-            <div class="lp-mockup-metric"><div class="mm-label" style="color:#d4a853">Revenue</div><div class="mm-val">₹29.7M</div></div>
-            <div class="lp-mockup-metric"><div class="mm-label" style="color:#9b7cb6">Users</div><div class="mm-val">1,164</div></div>
-            <div class="lp-mockup-metric"><div class="mm-label" style="color:#7cb67c">Accuracy</div><div class="mm-val">94.2%</div></div>
-          </div>
-          <div class="lp-chart-bars">
-            <div class="lp-bar" style="height:45%;background:linear-gradient(to top,rgba(212,168,83,.6),rgba(212,168,83,.2))"></div>
-            <div class="lp-bar" style="height:72%;background:linear-gradient(to top,rgba(155,124,182,.6),rgba(155,124,182,.2))"></div>
-            <div class="lp-bar" style="height:58%;background:linear-gradient(to top,rgba(91,184,196,.6),rgba(91,184,196,.2))"></div>
-            <div class="lp-bar" style="height:88%;background:linear-gradient(to top,rgba(124,182,124,.6),rgba(124,182,124,.2))"></div>
-            <div class="lp-bar" style="height:65%;background:linear-gradient(to top,rgba(196,112,75,.6),rgba(196,112,75,.2))"></div>
-            <div class="lp-bar" style="height:78%;background:linear-gradient(to top,rgba(212,168,83,.6),rgba(212,168,83,.2))"></div>
-            <div class="lp-bar" style="height:52%;background:linear-gradient(to top,rgba(155,124,182,.6),rgba(155,124,182,.2))"></div>
-            <div class="lp-bar" style="height:90%;background:linear-gradient(to top,rgba(91,184,196,.6),rgba(91,184,196,.2))"></div>
-            <div class="lp-bar" style="height:40%;background:linear-gradient(to top,rgba(124,182,124,.6),rgba(124,182,124,.2))"></div>
-            <div class="lp-bar" style="height:68%;background:linear-gradient(to top,rgba(196,112,75,.6),rgba(196,112,75,.2))"></div>
-          </div>
-        </div>""",unsafe_allow_html=True)
+          <h1 style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(2rem,5vw,3.2rem);line-height:1.1;letter-spacing:-0.03em;margin:0 0 16px">Pet Care Market<br><span style="background:linear-gradient(135deg,#d4a853 0%,#9b7cb6 60%,#5bb8c4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Intelligence</span> Dashboard</h1>
+          <p style="color:#c4b99a;font-size:15px;line-height:1.7;max-width:500px;margin-bottom:24px">Decode Indian pet care spending patterns, predict app adoption, and uncover regional insights with comprehensive ML-powered analytics.</p>
+        </div>""", unsafe_allow_html=True)
+    with hero_r:
+        st.markdown(f"""<div style="text-align:center;padding:10px 0">{AKITA_SVG}</div>""", unsafe_allow_html=True)
 
-    st.markdown("<div style='height:40px'></div>",unsafe_allow_html=True)
-
-    # CTA section
-    st.markdown("""<div class="lp-cta-box">
-      <div style="position:relative">
-        <h2 class="lp-section-title" style="margin-left:auto!important;margin-right:auto!important">Ready to decode the<br>pet care market?</h2>
-        <p class="lp-section-sub" style="margin:0 auto 28px;text-align:center">Launch the DogNap dashboard and start exploring ML-powered insights from 2,000 Indian dog owners.</p>
-        <div style="text-align:center"><span style="display:inline-block;padding:14px 32px;border-radius:16px;background:linear-gradient(135deg,#a07d3a,#9b7cb6);color:#ede4d3;font-weight:700;font-size:17px;box-shadow:0 4px 24px rgba(212,168,83,.25),0 16px 56px rgba(155,124,182,.12);letter-spacing:.01em">🐾&nbsp; Explore Dashboard →</span></div>
-      </div>
-    </div>""",unsafe_allow_html=True)
-
-    # Footer
-    st.markdown("""<div class="lp-footer">
-      <div class="lp-footer-brand"><div class="lp-flogo">🐾</div><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;color:#ede4d3">DogNap</span></div>
-      <span style="color:#5a5040;font-size:13px">Pet Care Market Intelligence Dashboard &middot; 2,000 owners &middot; 20 ML models</span>
-      <span style="color:#5a5040;font-size:11px">&copy; 2026 DogNap Analytics</span>
-    </div>""",unsafe_allow_html=True)
-
-elif page=="🏠 Home & Overview":
-    phdr("🐾","DogNap — Pet Care Market Intelligence",f"{len(df):,} Indian Dog Owners · Realistic 20/38/42 Distribution · 20 ML Models")
-    st.markdown(f"""<div style="background:linear-gradient(135deg,rgba(45,32,15,.2),rgba(15,12,10,.9));border:1px solid rgba(160,125,58,.2);border-radius:14px;padding:20px 24px;margin-bottom:20px"><div style="color:#d4a853;font-size:13px;font-weight:700;margin-bottom:8px;font-family:Bricolage Grotesque">🎯 The Central Question</div><div style="color:#c4b99a;font-size:14px;line-height:1.7">Can we predict pet-care app adoption from owner demographics and behaviour? With a <b style="color:#c4704b">realistic 20% YES rate</b> (not the fantasy 74%), models must actually <em>learn</em> to distinguish adopters from non-adopters.</div></div>""",unsafe_allow_html=True)
+    # === KEY METRICS (from Overview) ===
     yes_n=len(df[df["app_use_likelihood"]=="Yes"]);maybe_n=len(df[df["app_use_likelihood"]=="Maybe"]);no_n=len(df[df["app_use_likelihood"]=="No"])
     c1,c2,c3,c4,c5=st.columns(5)
     with c1:mc("Respondents",f"{len(df):,}","After cleaning")
     with c2:mc("YES Rate",f"{yes_n/len(df)*100:.0f}%",f"{yes_n} adopters","#7cb67c")
     with c3:mc("MAYBE Rate",f"{maybe_n/len(df)*100:.0f}%",f"{maybe_n} fence-sitters","#d4a853")
     with c4:mc("NO Rate",f"{no_n/len(df)*100:.0f}%",f"{no_n} rejectors","#c4704b")
-    with c5:mc("Avg Spend",f"₹{int(df['monthly_spend_inr'].mean()):,}","Monthly","#5bb8c4")
+    _avg=int(df["monthly_spend_inr"].mean())
+    with c5:mc("Avg Spend",f"\u20b9{_avg:,}","Monthly","#5bb8c4")
+
+    # === CENTRAL QUESTION ===
+    st.markdown(f"""<div style="background:linear-gradient(135deg,rgba(45,32,15,.2),rgba(15,12,10,.9));border:1px solid rgba(160,125,58,.2);border-radius:14px;padding:20px 24px;margin:20px 0"><div style="color:#d4a853;font-size:13px;font-weight:700;margin-bottom:8px;font-family:Bricolage Grotesque">\U0001f3af The Central Question</div><div style="color:#c4b99a;font-size:14px;line-height:1.7">Can we predict pet-care app adoption from owner demographics and behaviour? With a <b style="color:#c4704b">realistic 20% YES rate</b> (not the fantasy 74%), models must actually <em>learn</em> to distinguish adopters from non-adopters.</div></div>""",unsafe_allow_html=True)
+
     st.divider()
+
+    # === STATS BAR ===
+    st.markdown(f"""<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;padding:20px 0">
+      <div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-0.02em">{len(df):,}</div><div style="color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px">Dog Owners Surveyed</div></div>
+      <div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-0.02em">20</div><div style="color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px">ML Models Trained</div></div>
+      <div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-0.02em">40+</div><div style="color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px">Metrics Tracked</div></div>
+      <div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-0.02em">5</div><div style="color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px">Indian Regions</div></div>
+    </div>""",unsafe_allow_html=True)
+
+    st.divider()
+
+    # === CHARTS FROM OVERVIEW ===
     c1,c2=st.columns([2,1])
     with c1:
-        shdr("Target Distribution — Realistic App Adoption")
+        shdr("Target Distribution \u2014 Realistic App Adoption")
         cn=df["app_use_likelihood"].value_counts().reindex(["Yes","Maybe","No"])
         fig=go.Figure(go.Bar(x=cn.index,y=cn.values,marker=dict(color=["#7cb67c","#d4a853","#c4704b"]),text=[f"<b>{v}</b><br>({v/len(df)*100:.1f}%)" for v in cn.values],textposition="outside",textfont=dict(size=14)))
         fig.update_traces(marker_cornerradius=8);pp(fig,h=340,yaxis_title="Respondents")
         ca,cb,cc=st.columns(3)
-        with ca:insight("✅","Adopters",f"{yes_n}",f"Only {yes_n/len(df)*100:.0f}% — realistic early-adopter rate. These are the <b>high-spend, multi-service</b> owners.","#7cb67c")
-        with cb:insight("🤔","Fence-Sitters",f"{maybe_n}",f"{maybe_n/len(df)*100:.0f}% — the <b>conversion goldmine</b>. Understanding their barriers is the key business insight.","#d4a853")
-        with cc:insight("❌","Rejectors",f"{no_n}",f"{no_n/len(df)*100:.0f}% — significant resistance. Association rules reveal <b>why they say no</b>.","#c4704b")
+        with ca:insight("\u2705","Adopters",f"{yes_n}",f"Only {yes_n/len(df)*100:.0f}% \u2014 realistic early-adopter rate. These are the <b>high-spend, multi-service</b> owners.","#7cb67c")
+        with cb:insight("\U0001f914","Fence-Sitters",f"{maybe_n}",f"{maybe_n/len(df)*100:.0f}% \u2014 the <b>conversion goldmine</b>. Understanding their barriers is the key business insight.","#d4a853")
+        with cc:insight("\u274c","Rejectors",f"{no_n}",f"{no_n/len(df)*100:.0f}% \u2014 significant resistance. Association rules reveal <b>why they say no</b>.","#c4704b")
     with c2:
         shdr("Regional Split")
         rc=df["region"].value_counts()
@@ -308,14 +188,33 @@ elif page=="🏠 Home & Overview":
         fig2.update_layout(**DK,height=320,showlegend=False,annotations=[dict(text=f"<b>{len(df):,}</b>",x=.5,y=.5,font_size=16,font_color="#ede4d3",showarrow=False)])
         st.plotly_chart(fig2,use_container_width=True,config=PCFG)
     st.divider()
-    shdr("Spend × Adoption — The Primary Signal")
+    shdr("Spend \u00d7 Adoption \u2014 The Primary Signal")
     fig3=go.Figure()
     for cat,col in zip(["Yes","Maybe","No"],["#7cb67c","#d4a853","#c4704b"]):
         v=df[df["app_use_likelihood"]==cat]["monthly_spend_inr"]
         fig3.add_trace(go.Box(y=v,name=f"{cat} (n={len(v)})",marker_color=col,boxmean=True))
-    pp(fig3,h=360,yaxis_title="Monthly Spend (₹)")
+    pp(fig3,h=360,yaxis_title="Monthly Spend (\u20b9)")
     ys=int(df[df["app_use_likelihood"]=="Yes"]["monthly_spend_inr"].mean());ns=int(df[df["app_use_likelihood"]=="No"]["monthly_spend_inr"].mean())
-    kinsight(f"YES owners spend <b>₹{ys:,}/mo</b> vs NO owners <b>₹{ns:,}/mo</b> — a <b>₹{ys-ns:,} gap</b>. This is the feature ML models exploit most.")
+    kinsight(f"YES owners spend <b>\u20b9{ys:,}/mo</b> vs NO owners <b>\u20b9{ns:,}/mo</b> \u2014 a <b>\u20b9{ys-ns:,} gap</b>. This is the feature ML models exploit most.")
+
+    # === FEATURES GRID ===
+    st.divider()
+    st.markdown("""<div style="text-align:center;padding:20px 0 0">
+      <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:rgba(155,124,182,.08);border:1px solid rgba(155,124,182,.15);color:#9b7cb6;margin-bottom:16px">Platform Features</div>
+      <h2 style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-0.03em;margin:0 auto 8px">Everything you need for <span style="color:#d4a853">pet market analysis</span></h2>
+      <p style="color:#c4b99a;font-size:14px;line-height:1.7;max-width:500px;margin:0 auto">From spending prediction to regional segmentation, DogNap provides end-to-end intelligence for the Indian pet care market.</p>
+    </div>""",unsafe_allow_html=True)
+
+    f1,f2,f3=st.columns(3)
+    with f1:
+        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(212,168,83,.15),rgba(212,168,83,.05))">&#128302;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Spending Prediction</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">ML models predict monthly pet care expenditure using demographics and service usage.</div></div>""",unsafe_allow_html=True)
+        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(124,182,124,.15),rgba(124,182,124,.05))">&#128200;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Interactive Visualizations</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Plotly-powered charts with dark theme and real-time filtering.</div></div>""",unsafe_allow_html=True)
+    with f2:
+        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(155,124,182,.15),rgba(155,124,182,.05))">&#128202;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Regional Analytics</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Deep-dive into 5 Indian regions with spending and adoption heatmaps.</div></div>""",unsafe_allow_html=True)
+        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(196,112,75,.15),rgba(196,112,75,.05))">&#127919;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Demographic Segmentation</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Segment owners by age, ownership years, and service usage.</div></div>""",unsafe_allow_html=True)
+    with f3:
+        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(91,184,196,.15),rgba(91,184,196,.05))">&#128640;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">App Adoption Modeling</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Classify users as Yes, Maybe, or No with 20 trained models.</div></div>""",unsafe_allow_html=True)
+        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(201,169,78,.15),rgba(201,169,78,.05))">&#128229;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Export &amp; Reports</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Download data exports and model reports for offline analysis.</div></div>""",unsafe_allow_html=True)
 
 elif page=="🔬 ML Pipeline & Flowcharts":
     phdr("🔬","ML Pipeline & Algorithm Flowcharts","End-to-end workflow with real scores from all 20 models")
