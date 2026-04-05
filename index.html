@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DogNap — Pet Care Market Intelligence</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        bg: '#0f0d0b',
+        card: 'rgba(22,19,15,.88)',
+        border: 'rgba(80,65,40,.25)',
+        honey: '#d4a853',
+        sage: '#7cb67c',
+        terra: '#c4704b',
+        mauve: '#9b7cb6',
+        teal: '#5bb8c4',
+        cream: '#ede4d3',
+        text: '#c4b99a',
+        dim: '#7a6f5c',
+        mute: '#5a5040',
+      },
+      fontFamily: {
+        display: ['Bricolage Grotesque', 'system-ui', 'sans-serif'],
+        body: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f0d0b; color: #c4b99a; overflow-x: hidden; }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: .035;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  }
+
+  /* Ambient glow blobs */
+  .glow-honey {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(212,168,83,.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .glow-mauve {
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(155,124,182,.06) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* Smooth spring-like transitions */
+  .spring { transition: transform .35s cubic-bezier(.22,1,.36,1), opacity .35s cubic-bezier(.22,1,.36,1), box-shadow .35s cubic-bezier(.22,1,.36,1); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: rgba(212,168,83,.18); border-radius: 10px; }
+
+  /* Animate on scroll */
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Counter animation */
+  .counter { font-variant-numeric: tabular-nums; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  .float-slow { animation: float 6s ease-in-out infinite; }
+  .float-mid { animation: float 5s ease-in-out infinite; animation-delay: -2s; }
+  .float-fast { animation: float 4s ease-in-out infinite; animation-delay: -1s; }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: .5; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+</style>
+</head>
+<body class="relative min-h-screen">
+
+<!-- ===== AMBIENT BACKGROUND ===== -->
+<div class="glow-honey" style="top:-200px;left:-150px;"></div>
+<div class="glow-mauve" style="top:300px;right:-200px;"></div>
+<div class="glow-honey" style="bottom:-100px;left:40%;"></div>
+
+<!-- ===== NAV ===== -->
+<nav class="fixed top-0 inset-x-0 z-50 backdrop-blur-xl" style="background:rgba(15,13,11,.8);border-bottom:1px solid rgba(80,65,40,.15);">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-3 spring hover:opacity-80 focus-visible:outline-2 focus-visible:outline-honey focus-visible:outline-offset-4" style="outline-color:#d4a853;">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg" style="background:linear-gradient(135deg,#a07d3a,#9b7cb6);">
+        <span>🐾</span>
+      </div>
+      <span class="font-display font-bold text-cream text-lg tracking-tight">DogNap</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#features" class="text-dim text-sm font-medium spring hover:text-honey focus-visible:outline-2 focus-visible:outline-honey focus-visible:outline-offset-4 active:opacity-70" style="outline-color:#d4a853;">Features</a>
+      <a href="#metrics" class="text-dim text-sm font-medium spring hover:text-honey focus-visible:outline-2 focus-visible:outline-honey focus-visible:outline-offset-4 active:opacity-70" style="outline-color:#d4a853;">Metrics</a>
+      <a href="#insights" class="text-dim text-sm font-medium spring hover:text-honey focus-visible:outline-2 focus-visible:outline-honey focus-visible:outline-offset-4 active:opacity-70" style="outline-color:#d4a853;">Insights</a>
+      <a href="#cta" class="ml-2 px-5 py-2 rounded-xl text-cream text-sm font-bold spring hover:shadow-lg active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4" style="background:linear-gradient(135deg,#a07d3a,#9b7cb6);outline-color:#d4a853;box-shadow:0 2px 12px rgba(212,168,83,.15);">
+        Launch Dashboard
+      </a>
+    </div>
+    <!-- Mobile menu button -->
+    <button id="mobile-toggle" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg spring hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-honey" style="outline-color:#d4a853;" aria-label="Toggle menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="#c4b99a" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="md:hidden hidden px-6 pb-4 flex flex-col gap-3">
+    <a href="#features" class="text-dim text-sm font-medium py-2 spring hover:text-honey">Features</a>
+    <a href="#metrics" class="text-dim text-sm font-medium py-2 spring hover:text-honey">Metrics</a>
+    <a href="#insights" class="text-dim text-sm font-medium py-2 spring hover:text-honey">Insights</a>
+    <a href="#cta" class="mt-1 px-5 py-2.5 rounded-xl text-cream text-sm font-bold text-center" style="background:linear-gradient(135deg,#a07d3a,#9b7cb6);">Launch Dashboard</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="relative z-10 pt-32 pb-20 md:pt-44 md:pb-32 px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="max-w-3xl">
+      <!-- Badge -->
+      <div class="reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8" style="background:rgba(212,168,83,.08);border:1px solid rgba(212,168,83,.15);">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full rounded-full opacity-50" style="background:#7cb67c;animation:pulse-ring 2s cubic-bezier(0,0,.2,1) infinite;"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2" style="background:#7cb67c;"></span>
+        </span>
+        <span class="text-honey text-xs font-semibold tracking-wide uppercase">20 ML Models &middot; 2,000 Dog Owners Analyzed</span>
+      </div>
+      <!-- Heading -->
+      <h1 class="reveal font-display font-extrabold text-cream leading-[1.05]" style="font-size:clamp(2.5rem,6vw,4.5rem);letter-spacing:-0.03em;">
+        Pet Care Market<br>
+        <span style="background:linear-gradient(135deg,#d4a853 0%,#9b7cb6 60%,#5bb8c4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Intelligence</span>
+        <br>Dashboard
+      </h1>
+      <!-- Subtitle -->
+      <p class="reveal mt-6 text-text text-lg md:text-xl max-w-xl" style="line-height:1.7;">
+        Decode Indian pet care spending patterns, predict app adoption, and uncover regional insights with comprehensive ML-powered analytics.
+      </p>
+      <!-- CTA buttons -->
+      <div class="reveal mt-10 flex flex-wrap gap-4">
+        <a href="#cta" class="group inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-cream font-bold spring hover:shadow-2xl active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4" style="background:linear-gradient(135deg,#a07d3a,#9b7cb6);box-shadow:0 4px 24px rgba(212,168,83,.2),0 12px 48px rgba(155,124,182,.1);outline-color:#d4a853;">
+          Explore Dashboard
+          <svg class="w-4 h-4 spring group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+        <a href="#features" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl text-text font-semibold spring hover:text-cream hover:border-honey/40 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4" style="border:1px solid rgba(80,65,40,.35);outline-color:#d4a853;">
+          View Features
+        </a>
+      </div>
+    </div>
+
+    <!-- Hero visual — floating metric cards -->
+    <div class="hidden lg:block absolute right-8 top-40 xl:right-16" style="perspective:1000px;">
+      <div class="relative w-[420px] h-[380px]">
+        <!-- Card 1 -->
+        <div class="float-slow absolute top-0 right-0 w-56 p-5 rounded-2xl" style="background:rgba(22,19,15,.92);border:1px solid rgba(80,65,40,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),0 2px 8px rgba(212,168,83,.06);transform:rotate(3deg);">
+          <div class="text-honey text-[9px] font-bold tracking-widest uppercase mb-2">Avg Monthly Spend</div>
+          <div class="font-display font-extrabold text-cream text-3xl tracking-tight">₹14,847</div>
+          <div class="mt-2 flex items-center gap-1">
+            <span class="text-sage text-xs font-bold">+12.3%</span>
+            <span class="text-mute text-xs">vs last quarter</span>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="float-mid absolute top-28 left-0 w-52 p-5 rounded-2xl" style="background:rgba(22,19,15,.92);border:1px solid rgba(80,65,40,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),0 2px 8px rgba(155,124,182,.06);transform:rotate(-2deg);">
+          <div class="text-mauve text-[9px] font-bold tracking-widest uppercase mb-2">App Adoption Rate</div>
+          <div class="font-display font-extrabold text-cream text-3xl tracking-tight">58.2%</div>
+          <div class="mt-3 w-full h-1.5 rounded-full" style="background:rgba(155,124,182,.15);">
+            <div class="h-full rounded-full" style="width:58%;background:linear-gradient(90deg,#9b7cb6,#5bb8c4);"></div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="float-fast absolute bottom-0 right-8 w-48 p-5 rounded-2xl" style="background:rgba(22,19,15,.92);border:1px solid rgba(80,65,40,.3);box-shadow:0 8px 32px rgba(0,0,0,.4),0 2px 8px rgba(124,182,124,.06);transform:rotate(1deg);">
+          <div class="text-sage text-[9px] font-bold tracking-widest uppercase mb-2">Regions Covered</div>
+          <div class="font-display font-extrabold text-cream text-3xl tracking-tight">5</div>
+          <div class="mt-2 flex gap-1">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold" style="background:rgba(124,182,124,.12);color:#7cb67c;">North</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold" style="background:rgba(91,184,196,.12);color:#5bb8c4;">South</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold" style="background:rgba(196,112,75,.12);color:#c4704b;">East</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TRUSTED BY / STATS BAR ===== -->
+<section id="metrics" class="relative z-10 py-16 px-6" style="border-top:1px solid rgba(80,65,40,.12);border-bottom:1px solid rgba(80,65,40,.12);">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
+      <div class="reveal text-center">
+        <div class="font-display font-extrabold text-cream text-4xl md:text-5xl tracking-tight counter" data-target="2000">2,000</div>
+        <div class="mt-2 text-dim text-sm font-medium">Dog Owners Surveyed</div>
+      </div>
+      <div class="reveal text-center">
+        <div class="font-display font-extrabold text-cream text-4xl md:text-5xl tracking-tight counter" data-target="20">20</div>
+        <div class="mt-2 text-dim text-sm font-medium">ML Models Trained</div>
+      </div>
+      <div class="reveal text-center">
+        <div class="font-display font-extrabold text-cream text-4xl md:text-5xl tracking-tight">40+</div>
+        <div class="mt-2 text-dim text-sm font-medium">Metrics Tracked</div>
+      </div>
+      <div class="reveal text-center">
+        <div class="font-display font-extrabold text-cream text-4xl md:text-5xl tracking-tight">5</div>
+        <div class="mt-2 text-dim text-sm font-medium">Indian Regions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features" class="relative z-10 py-24 md:py-32 px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <div class="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full mb-5" style="background:rgba(155,124,182,.08);border:1px solid rgba(155,124,182,.15);">
+        <span class="text-mauve text-xs font-semibold tracking-wide uppercase">Platform Features</span>
+      </div>
+      <h2 class="reveal font-display font-extrabold text-cream text-3xl md:text-4xl" style="letter-spacing:-0.03em;">
+        Everything you need for<br><span class="text-honey">pet market analysis</span>
+      </h2>
+      <p class="reveal mt-4 text-text text-base" style="line-height:1.7;">
+        From spending prediction to regional segmentation, DogNap provides end-to-end intelligence for the Indian pet care market.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- Feature 1 -->
+      <div class="reveal group p-6 rounded-2xl spring hover:scale-[1.02] focus-within:scale-[1.02]" style="background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);" tabindex="0">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 spring group-hover:scale-110" style="background:linear-gradient(135deg,rgba(212,168,83,.15),rgba(212,168,83,.05));box-shadow:0 4px 16px rgba(212,168,83,.08);">
+          <svg class="w-5 h-5 text-honey" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-cream text-lg mb-2">Spending Prediction</h3>
+        <p class="text-text text-sm" style="line-height:1.7;">ML models predict monthly pet care expenditure using demographics, ownership history, and service usage patterns.</p>
+      </div>
+      <!-- Feature 2 -->
+      <div class="reveal group p-6 rounded-2xl spring hover:scale-[1.02] focus-within:scale-[1.02]" style="background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);" tabindex="0">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 spring group-hover:scale-110" style="background:linear-gradient(135deg,rgba(155,124,182,.15),rgba(155,124,182,.05));box-shadow:0 4px 16px rgba(155,124,182,.08);">
+          <svg class="w-5 h-5 text-mauve" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m0 0v-9a2 2 0 012-2h2a2 2 0 012 2v9m-6 0H9"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-cream text-lg mb-2">Regional Analytics</h3>
+        <p class="text-text text-sm" style="line-height:1.7;">Deep-dive into North, South, East, West, and Central India with region-specific spending and adoption heatmaps.</p>
+      </div>
+      <!-- Feature 3 -->
+      <div class="reveal group p-6 rounded-2xl spring hover:scale-[1.02] focus-within:scale-[1.02]" style="background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);" tabindex="0">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 spring group-hover:scale-110" style="background:linear-gradient(135deg,rgba(91,184,196,.15),rgba(91,184,196,.05));box-shadow:0 4px 16px rgba(91,184,196,.08);">
+          <svg class="w-5 h-5 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.63 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.841m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-cream text-lg mb-2">App Adoption Modeling</h3>
+        <p class="text-text text-sm" style="line-height:1.7;">Classify users as Yes, Maybe, or No for app adoption using 20 trained models with comprehensive performance metrics.</p>
+      </div>
+      <!-- Feature 4 -->
+      <div class="reveal group p-6 rounded-2xl spring hover:scale-[1.02] focus-within:scale-[1.02]" style="background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);" tabindex="0">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 spring group-hover:scale-110" style="background:linear-gradient(135deg,rgba(124,182,124,.15),rgba(124,182,124,.05));box-shadow:0 4px 16px rgba(124,182,124,.08);">
+          <svg class="w-5 h-5 text-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-cream text-lg mb-2">Interactive Visualizations</h3>
+        <p class="text-text text-sm" style="line-height:1.7;">Plotly-powered charts with dark theme, drill-down capability, and real-time filtering across all dimensions.</p>
+      </div>
+      <!-- Feature 5 -->
+      <div class="reveal group p-6 rounded-2xl spring hover:scale-[1.02] focus-within:scale-[1.02]" style="background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);" tabindex="0">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 spring group-hover:scale-110" style="background:linear-gradient(135deg,rgba(196,112,75,.15),rgba(196,112,75,.05));box-shadow:0 4px 16px rgba(196,112,75,.08);">
+          <svg class="w-5 h-5 text-terra" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-cream text-lg mb-2">Demographic Segmentation</h3>
+        <p class="text-text text-sm" style="line-height:1.7;">Segment owners by age group, ownership years, number of dogs, and service usage for targeted marketing strategies.</p>
+      </div>
+      <!-- Feature 6 -->
+      <div class="reveal group p-6 rounded-2xl spring hover:scale-[1.02] focus-within:scale-[1.02]" style="background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);" tabindex="0">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 spring group-hover:scale-110" style="background:linear-gradient(135deg,rgba(201,169,78,.15),rgba(201,169,78,.05));box-shadow:0 4px 16px rgba(201,169,78,.08);">
+          <svg class="w-5 h-5" style="color:#c9a94e" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+        </div>
+        <h3 class="font-display font-bold text-cream text-lg mb-2">Export &amp; Reports</h3>
+        <p class="text-text text-sm" style="line-height:1.7;">Download comprehensive data exports and model performance reports for offline analysis and stakeholder presentations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== INSIGHTS / HOW IT WORKS ===== -->
+<section id="insights" class="relative z-10 py-24 md:py-32 px-6" style="background:linear-gradient(180deg,rgba(22,19,15,.4) 0%,transparent 100%);">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <!-- Left: Content -->
+      <div>
+        <div class="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full mb-5" style="background:rgba(91,184,196,.08);border:1px solid rgba(91,184,196,.15);">
+          <span class="text-teal text-xs font-semibold tracking-wide uppercase">How It Works</span>
+        </div>
+        <h2 class="reveal font-display font-extrabold text-cream text-3xl md:text-4xl mb-6" style="letter-spacing:-0.03em;">
+          From raw data to<br><span class="text-honey">actionable insights</span>
+        </h2>
+        <div class="space-y-6">
+          <div class="reveal flex gap-4">
+            <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-display font-bold text-sm" style="background:linear-gradient(135deg,rgba(212,168,83,.15),rgba(212,168,83,.05));color:#d4a853;border:1px solid rgba(212,168,83,.2);">1</div>
+            <div>
+              <h4 class="font-display font-bold text-cream mb-1">Data Collection</h4>
+              <p class="text-text text-sm" style="line-height:1.7;">Survey data from 2,000 Indian dog owners across 5 regions with realistic demographic distributions.</p>
+            </div>
+          </div>
+          <div class="reveal flex gap-4">
+            <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-display font-bold text-sm" style="background:linear-gradient(135deg,rgba(155,124,182,.15),rgba(155,124,182,.05));color:#9b7cb6;border:1px solid rgba(155,124,182,.2);">2</div>
+            <div>
+              <h4 class="font-display font-bold text-cream mb-1">Model Training</h4>
+              <p class="text-text text-sm" style="line-height:1.7;">20 ML models including Random Forest, XGBoost, SVM, and Neural Networks trained with cross-validation.</p>
+            </div>
+          </div>
+          <div class="reveal flex gap-4">
+            <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-display font-bold text-sm" style="background:linear-gradient(135deg,rgba(91,184,196,.15),rgba(91,184,196,.05));color:#5bb8c4;border:1px solid rgba(91,184,196,.2);">3</div>
+            <div>
+              <h4 class="font-display font-bold text-cream mb-1">Insight Generation</h4>
+              <p class="text-text text-sm" style="line-height:1.7;">Interactive dashboard surfaces spending patterns, adoption drivers, and segment-level recommendations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Dashboard preview card -->
+      <div class="reveal">
+        <div class="p-6 md:p-8 rounded-3xl" style="background:rgba(22,19,15,.85);border:1px solid rgba(80,65,40,.25);box-shadow:0 8px 40px rgba(0,0,0,.4),0 2px 12px rgba(212,168,83,.04);">
+          <!-- Mini dashboard mockup -->
+          <div class="flex items-center gap-3 mb-6">
+            <div class="flex gap-1.5">
+              <div class="w-3 h-3 rounded-full" style="background:#c4704b;"></div>
+              <div class="w-3 h-3 rounded-full" style="background:#d4a853;"></div>
+              <div class="w-3 h-3 rounded-full" style="background:#7cb67c;"></div>
+            </div>
+            <div class="flex-1 h-6 rounded-lg" style="background:rgba(80,65,40,.15);"></div>
+          </div>
+          <!-- Metric row -->
+          <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="p-3 rounded-xl" style="background:rgba(15,13,11,.6);border:1px solid rgba(80,65,40,.15);">
+              <div class="text-honey text-[8px] font-bold tracking-widest uppercase mb-1">Revenue</div>
+              <div class="font-display font-extrabold text-cream text-lg">₹29.7M</div>
+            </div>
+            <div class="p-3 rounded-xl" style="background:rgba(15,13,11,.6);border:1px solid rgba(80,65,40,.15);">
+              <div class="text-mauve text-[8px] font-bold tracking-widest uppercase mb-1">Users</div>
+              <div class="font-display font-extrabold text-cream text-lg">1,164</div>
+            </div>
+            <div class="p-3 rounded-xl" style="background:rgba(15,13,11,.6);border:1px solid rgba(80,65,40,.15);">
+              <div class="text-sage text-[8px] font-bold tracking-widest uppercase mb-1">Accuracy</div>
+              <div class="font-display font-extrabold text-cream text-lg">94.2%</div>
+            </div>
+          </div>
+          <!-- Chart mockup -->
+          <div class="h-40 rounded-xl flex items-end gap-1.5 p-4" style="background:rgba(15,13,11,.6);border:1px solid rgba(80,65,40,.15);">
+            <div class="flex-1 rounded-t-md" style="height:45%;background:linear-gradient(to top,rgba(212,168,83,.6),rgba(212,168,83,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:72%;background:linear-gradient(to top,rgba(155,124,182,.6),rgba(155,124,182,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:58%;background:linear-gradient(to top,rgba(91,184,196,.6),rgba(91,184,196,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:88%;background:linear-gradient(to top,rgba(124,182,124,.6),rgba(124,182,124,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:65%;background:linear-gradient(to top,rgba(196,112,75,.6),rgba(196,112,75,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:78%;background:linear-gradient(to top,rgba(212,168,83,.6),rgba(212,168,83,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:52%;background:linear-gradient(to top,rgba(155,124,182,.6),rgba(155,124,182,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:90%;background:linear-gradient(to top,rgba(91,184,196,.6),rgba(91,184,196,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:40%;background:linear-gradient(to top,rgba(124,182,124,.6),rgba(124,182,124,.2));"></div>
+            <div class="flex-1 rounded-t-md" style="height:68%;background:linear-gradient(to top,rgba(196,112,75,.6),rgba(196,112,75,.2));"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section id="cta" class="relative z-10 py-24 md:py-32 px-6">
+  <div class="max-w-3xl mx-auto text-center">
+    <div class="reveal p-10 md:p-14 rounded-3xl relative overflow-hidden" style="background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.25);box-shadow:0 8px 48px rgba(0,0,0,.4),0 2px 16px rgba(212,168,83,.06);">
+      <!-- Background gradient accent -->
+      <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at 50% 0%,rgba(212,168,83,.06) 0%,transparent 60%);"></div>
+      <div class="relative">
+        <h2 class="font-display font-extrabold text-cream text-3xl md:text-4xl mb-4" style="letter-spacing:-0.03em;">
+          Ready to decode the<br>pet care market?
+        </h2>
+        <p class="text-text text-base mb-8 max-w-lg mx-auto" style="line-height:1.7;">
+          Launch the DogNap dashboard and start exploring ML-powered insights from 2,000 Indian dog owners.
+        </p>
+        <a href="#" class="group inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-cream font-bold text-lg spring hover:shadow-2xl active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4" style="background:linear-gradient(135deg,#a07d3a,#9b7cb6);box-shadow:0 4px 24px rgba(212,168,83,.25),0 16px 56px rgba(155,124,182,.12);outline-color:#d4a853;">
+          Launch Dashboard
+          <svg class="w-5 h-5 spring group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="relative z-10 py-12 px-6" style="border-top:1px solid rgba(80,65,40,.12);">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style="background:linear-gradient(135deg,#a07d3a,#9b7cb6);">🐾</div>
+      <span class="font-display font-bold text-cream">DogNap</span>
+    </div>
+    <p class="text-mute text-sm">Pet Care Market Intelligence Dashboard &middot; 2,000 owners &middot; 20 ML models</p>
+    <p class="text-mute text-xs">&copy; 2026 DogNap Analytics</p>
+  </div>
+</footer>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Mobile menu
+document.getElementById('mobile-toggle').addEventListener('click', () => {
+  document.getElementById('mobile-menu').classList.toggle('hidden');
+});
+
+// Close mobile menu on link click
+document.querySelectorAll('#mobile-menu a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobile-menu').classList.add('hidden'));
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
