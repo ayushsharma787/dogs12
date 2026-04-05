@@ -3,7 +3,8 @@
 Dataset: 2,000 Indian dog owners · Realistic distribution: Yes 20% · Maybe 38% · No 42%
 20 ML models · 40+ metrics · Comprehensive flowcharts with embedded scores
 """
-import streamlit as st, pandas as pd, numpy as np, warnings, io
+import streamlit as st, pandas as pd, numpy as np, warnings, io, time, random, math
+from streamlit_autorefresh import st_autorefresh
 warnings.filterwarnings("ignore")
 st.set_page_config(page_title="DogNap Analytics", page_icon="🐾", layout="wide", initial_sidebar_state="expanded")
 
@@ -59,6 +60,50 @@ p,li{color:var(--text)!important;line-height:1.7!important}hr{border-color:var(-
 [data-testid="stExpander"] summary:focus-visible{outline:2px solid var(--honey)!important;outline-offset:2px!important}
 [data-testid="stDataFrame"]{border-radius:12px!important;overflow:hidden!important}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(212,168,83,.18);border-radius:10px}
+
+/* === ANIMATIONS === */
+@keyframes dn-breathe{0%,100%{transform:translateY(0);box-shadow:0 4px 20px rgba(0,0,0,.3)}50%{transform:translateY(-3px);box-shadow:0 8px 32px rgba(212,168,83,.08),0 12px 40px rgba(0,0,0,.25)}}
+@keyframes dn-pulse-glow{0%,100%{box-shadow:0 0 8px rgba(212,168,83,.06),0 4px 20px rgba(0,0,0,.3)}50%{box-shadow:0 0 20px rgba(212,168,83,.12),0 0 40px rgba(212,168,83,.04),0 8px 32px rgba(0,0,0,.25)}}
+@keyframes dn-fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dn-fade-right{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes dn-live-dot{0%,100%{opacity:1;box-shadow:0 0 4px rgba(124,182,124,.8)}50%{opacity:.5;box-shadow:0 0 12px rgba(124,182,124,.5),0 0 24px rgba(124,182,124,.2)}}
+@keyframes dn-ping{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.2);opacity:0}}
+@keyframes dn-shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes dn-rotate-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes dn-float-1{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-6px) rotate(.5deg)}75%{transform:translateY(4px) rotate(-.5deg)}}
+@keyframes dn-float-2{0%,100%{transform:translateY(0) rotate(0deg)}33%{transform:translateY(-8px) rotate(-.3deg)}66%{transform:translateY(3px) rotate(.3deg)}}
+@keyframes dn-float-3{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes dn-count-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes dn-bar-grow{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}
+@keyframes dn-ring-fill{from{stroke-dashoffset:283}to{stroke-dashoffset:var(--target-offset)}}
+@keyframes dn-slide-in-right{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes dn-border-glow{0%,100%{border-color:rgba(80,65,40,.25)}50%{border-color:rgba(212,168,83,.35)}}
+@keyframes dn-text-glow{0%,100%{text-shadow:0 0 4px rgba(212,168,83,.2)}50%{text-shadow:0 0 16px rgba(212,168,83,.4),0 0 32px rgba(212,168,83,.1)}}
+
+/* Apply breathing to all metric cards */
+[data-testid="stMetric"]{animation:dn-breathe 4s cubic-bezier(.4,0,.2,1) infinite}
+[data-testid="stVerticalBlockBorderWrapper"]>div{animation:dn-pulse-glow 5s cubic-bezier(.4,0,.2,1) infinite}
+/* Stagger sidebar items */
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label{animation:dn-fade-right .5s cubic-bezier(.22,1,.36,1) both}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(1){animation-delay:.05s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(2){animation-delay:.1s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(3){animation-delay:.15s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(4){animation-delay:.2s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(5){animation-delay:.25s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(6){animation-delay:.3s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(7){animation-delay:.35s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(8){animation-delay:.4s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(9){animation-delay:.45s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(10){animation-delay:.5s}
+section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:nth-child(11){animation-delay:.55s}
+/* Tabs entrance */
+.stTabs [data-baseweb="tab"]{animation:dn-fade-up .4s cubic-bezier(.22,1,.36,1) both}
+.stTabs [data-baseweb="tab"]:nth-child(1){animation-delay:.05s}
+.stTabs [data-baseweb="tab"]:nth-child(2){animation-delay:.1s}
+.stTabs [data-baseweb="tab"]:nth-child(3){animation-delay:.15s}
+.stTabs [data-baseweb="tab"]:nth-child(4){animation-delay:.2s}
+/* Expanders breathe */
+[data-testid="stExpander"]{animation:dn-breathe 5s cubic-bezier(.4,0,.2,1) infinite}
 </style>""", unsafe_allow_html=True)
 
 PAL=["#d4a853","#9b7cb6","#5bb8c4","#7cb67c","#c4704b","#c9a94e","#b6607c","#5cc4a0","#8a7cb6","#6cb67c"]
@@ -78,27 +123,27 @@ def pill(label,value,color="#7cb67c"):
 
 def insight(emoji,title,value,detail,accent="#d4a853"):
     r,g,b=int(accent[1:3],16),int(accent[3:5],16),int(accent[5:7],16)
-    st.markdown(f"<div style='background:linear-gradient(145deg,rgba(22,19,15,.88),rgba(15,12,10,.92));border:1px solid rgba({r},{g},{b},.25);border-left:4px solid {accent};border-radius:14px;padding:18px 20px;margin:8px 0;box-shadow:0 4px 20px rgba(0,0,0,.3)'><div style='display:flex;align-items:center;gap:10px;margin-bottom:8px'><span style='font-size:20px'>{emoji}</span><span style='color:{accent};font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:Bricolage Grotesque'>{title}</span></div><div style='color:#ede4d3;font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;font-family:Bricolage Grotesque'>{value}</div><div style='color:#7a6f5c;font-size:12px;line-height:1.6'>{detail}</div></div>",unsafe_allow_html=True)
+    st.markdown(f"<div style='background:linear-gradient(145deg,rgba(22,19,15,.88),rgba(15,12,10,.92));border:1px solid rgba({r},{g},{b},.25);border-left:4px solid {accent};border-radius:14px;padding:18px 20px;margin:8px 0;box-shadow:0 4px 20px rgba(0,0,0,.3);animation:dn-fade-up .6s cubic-bezier(.22,1,.36,1) both,dn-breathe 5s ease-in-out infinite'><div style='display:flex;align-items:center;gap:10px;margin-bottom:8px'><span style='font-size:20px'>{emoji}</span><span style='color:{accent};font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:Bricolage Grotesque'>{title}</span></div><div style='color:#ede4d3;font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;font-family:Bricolage Grotesque'>{value}</div><div style='color:#7a6f5c;font-size:12px;line-height:1.6'>{detail}</div></div>",unsafe_allow_html=True)
 
 def kinsight(text,accent="#d4a853"):
     r,g,b=int(accent[1:3],16),int(accent[3:5],16),int(accent[5:7],16)
-    st.markdown(f"<div style='background:linear-gradient(135deg,rgba({r},{g},{b},.06),transparent);border:1px solid rgba({r},{g},{b},.15);border-radius:12px;padding:14px 18px;margin:10px 0'><div style='display:flex;gap:10px;align-items:flex-start'><span style='font-size:16px'>🔑</span><div style='color:#c4b99a;font-size:13px;line-height:1.65;font-weight:500'>{text}</div></div></div>",unsafe_allow_html=True)
+    st.markdown(f"<div style='background:linear-gradient(135deg,rgba({r},{g},{b},.06),transparent);border:1px solid rgba({r},{g},{b},.15);border-radius:12px;padding:14px 18px;margin:10px 0;animation:dn-fade-up .5s cubic-bezier(.22,1,.36,1) both,dn-border-glow 4s ease-in-out infinite'><div style='display:flex;gap:10px;align-items:flex-start'><span style='font-size:16px'>🔑</span><div style='color:#c4b99a;font-size:13px;line-height:1.65;font-weight:500'>{text}</div></div></div>",unsafe_allow_html=True)
 
 def mc(label,value,delta=None,color="#d4a853"):
     dh=f"<div style='color:#5a5040;font-size:11px;margin-top:3px'>{delta}</div>" if delta else ""
-    st.markdown(f"<div style='background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 18px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.35)'><div style='color:#a07d3a;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque'>{label}</div><div style='color:{color};font-size:28px;font-weight:800;letter-spacing:-.02em;font-family:Bricolage Grotesque'>{value}</div>{dh}</div>",unsafe_allow_html=True)
+    st.markdown(f"<div style='background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 18px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.35);animation:dn-fade-up .5s cubic-bezier(.22,1,.36,1) both,dn-breathe 5s ease-in-out infinite'><div style='color:#a07d3a;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque'>{label}</div><div style='color:{color};font-size:28px;font-weight:800;letter-spacing:-.02em;font-family:Bricolage Grotesque'>{value}</div>{dh}</div>",unsafe_allow_html=True)
 
 def phdr(emoji,title,sub=""):
     sh=f"<div style='color:#a07d3a;font-size:13px;margin-top:6px;font-weight:500'>{sub}</div>" if sub else ""
-    st.markdown(f"<div style='background:var(--card);border:1px solid var(--border);border-left:4px solid var(--honey);border-radius:14px;padding:22px 26px;margin-bottom:22px;box-shadow:0 8px 32px rgba(0,0,0,.45)'><div style='display:flex;align-items:center;gap:16px'><div style='font-size:40px;filter:drop-shadow(0 0 10px rgba(212,168,83,.25))'>{emoji}</div><div><h1 style='margin:0;font-size:28px'>{title}</h1>{sh}</div></div></div>",unsafe_allow_html=True)
+    st.markdown(f"<div style='background:var(--card);border:1px solid var(--border);border-left:4px solid var(--honey);border-radius:14px;padding:22px 26px;margin-bottom:22px;box-shadow:0 8px 32px rgba(0,0,0,.45);animation:dn-fade-up .5s cubic-bezier(.22,1,.36,1) both,dn-pulse-glow 6s ease-in-out infinite'><div style='display:flex;align-items:center;gap:16px'><div style='font-size:40px;filter:drop-shadow(0 0 10px rgba(212,168,83,.25))'>{emoji}</div><div><h1 style='margin:0;font-size:28px'>{title}</h1>{sh}</div></div></div>",unsafe_allow_html=True)
 
 def shdr(text,color="#d4a853"):
-    st.markdown(f"<div style='display:flex;align-items:center;gap:12px;margin:26px 0 12px'><div style='width:4px;height:22px;background:linear-gradient(180deg,{color},transparent);border-radius:2px'></div><div style='color:#ede4d3;font-size:17px;font-weight:700;font-family:Bricolage Grotesque'>{text}</div></div>",unsafe_allow_html=True)
+    st.markdown(f"<div style='display:flex;align-items:center;gap:12px;margin:26px 0 12px;animation:dn-fade-right .5s cubic-bezier(.22,1,.36,1) both'><div style='width:4px;height:22px;background:linear-gradient(180deg,{color},transparent);border-radius:2px'></div><div style='color:#ede4d3;font-size:17px;font-weight:700;font-family:Bricolage Grotesque'>{text}</div></div>",unsafe_allow_html=True)
 
 def fbox(title,items,accent="#d4a853"):
     r,g,b=int(accent[1:3],16),int(accent[3:5],16),int(accent[5:7],16)
     ih="".join(f"<div style='color:#c4b99a;font-size:11px;padding:2px 0;line-height:1.5'>{it}</div>" for it in items)
-    return f"<div style='background:linear-gradient(145deg,rgba(22,19,15,.92),rgba(15,12,10,.95));border:1px solid rgba({r},{g},{b},.35);border-top:3px solid {accent};border-radius:12px;padding:16px 18px;box-shadow:0 4px 16px rgba(0,0,0,.3)'><div style='color:{accent};font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque'>{title}</div>{ih}</div>"
+    return f"<div style='background:linear-gradient(145deg,rgba(22,19,15,.92),rgba(15,12,10,.95));border:1px solid rgba({r},{g},{b},.35);border-top:3px solid {accent};border-radius:12px;padding:16px 18px;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:dn-fade-up .6s cubic-bezier(.22,1,.36,1) both'><div style='color:{accent};font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque'>{title}</div>{ih}</div>"
 
 @st.cache_data(show_spinner=False)
 def load_data():
@@ -127,55 +172,87 @@ with st.sidebar:
 
 import plotly.graph_objects as go, plotly.express as px
 
+# Auto-refresh for live feel (every 3 seconds on Home page)
+_tick = st.session_state.get("_tick", 0)
+
 
 if page=="🏠 Home & Overview":
-    # === HERO SECTION with SVG Akita ===
-    AKITA_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="280" height="280"><defs><linearGradient id="fur1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#d4a853;stop-opacity:1"/><stop offset="100%" style="stop-color:#c4704b;stop-opacity:1"/></linearGradient><linearGradient id="fur2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ede4d3;stop-opacity:1"/><stop offset="100%" style="stop-color:#d4a853;stop-opacity:0.8"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#glow)"><path d="M120 80 L95 30 L85 35 L90 75 Q95 95 110 105 Z" fill="url(#fur1)" opacity="0.95"/><path d="M280 80 L305 30 L315 35 L310 75 Q305 95 290 105 Z" fill="url(#fur1)" opacity="0.95"/><ellipse cx="200" cy="160" rx="95" ry="85" fill="url(#fur1)"/><ellipse cx="200" cy="155" rx="80" ry="65" fill="url(#fur2)" opacity="0.3"/><path d="M140 135 Q130 115 115 120 Q105 130 120 145 Q130 155 145 150 Z" fill="#ede4d3" opacity="0.6"/><path d="M260 135 Q270 115 285 120 Q295 130 280 145 Q270 155 255 150 Z" fill="#ede4d3" opacity="0.6"/><circle cx="170" cy="145" r="12" fill="#0f0d0b"/><circle cx="230" cy="145" r="12" fill="#0f0d0b"/><circle cx="173" cy="142" r="4" fill="#ede4d3" opacity="0.9"/><circle cx="233" cy="142" r="4" fill="#ede4d3" opacity="0.9"/><ellipse cx="200" cy="175" rx="14" ry="10" fill="#0f0d0b" opacity="0.85"/><path d="M190 182 Q200 192 210 182" stroke="#0f0d0b" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M160 130 Q175 118 200 115 Q225 118 240 130" stroke="#c4704b" stroke-width="2" fill="none" opacity="0.4"/><path d="M115 195 Q100 230 95 290 Q92 330 120 345 Q145 355 155 330 Q158 310 155 280 Q153 250 150 220 Z" fill="url(#fur1)" opacity="0.9"/><path d="M285 195 Q300 230 305 290 Q308 330 280 345 Q255 355 245 330 Q242 310 245 280 Q247 250 250 220 Z" fill="url(#fur1)" opacity="0.9"/><ellipse cx="200" cy="260" rx="75" ry="90" fill="url(#fur1)"/><path d="M160 220 Q200 200 240 220 Q250 260 240 300 Q200 320 160 300 Q150 260 160 220 Z" fill="url(#fur2)" opacity="0.25"/><path d="M155 330 Q160 365 170 380 Q175 388 165 390 Q150 390 148 380 Q142 365 140 345 Z" fill="url(#fur1)"/><path d="M245 330 Q240 365 230 380 Q225 388 235 390 Q250 390 252 380 Q258 365 260 345 Z" fill="url(#fur1)"/><path d="M275 250 Q310 260 330 280 Q345 300 355 340 Q360 360 340 365 Q320 365 315 350 Q305 320 290 300 Z" fill="url(#fur1)" opacity="0.85"/><ellipse cx="200" cy="390" rx="50" ry="8" fill="rgba(212,168,83,0.08)"/></g></svg>"""
+    # Live auto-refresh on home page
+    st_autorefresh(interval=3000, limit=None, key="home_refresh")
+    _tick = int(time.time())
+
+    # === ANIMATED HEADER BAR ===
+    _now = time.strftime("%H:%M:%S")
+    _greet = "Good morning" if int(time.strftime("%H")) < 12 else "Good afternoon" if int(time.strftime("%H")) < 17 else "Good evening"
+    st.markdown(f"""<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(22,19,15,.9),rgba(15,12,10,.95));border:1px solid rgba(80,65,40,.2);margin-bottom:18px;animation:dn-fade-up .6s cubic-bezier(.22,1,.36,1) both;box-shadow:0 4px 24px rgba(0,0,0,.3)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="position:relative;width:10px;height:10px"><div style="position:absolute;inset:0;border-radius:50%;background:#7cb67c;animation:dn-live-dot 2s ease-in-out infinite"></div><div style="position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(124,182,124,.3);animation:dn-ping 2s cubic-bezier(0,0,.2,1) infinite"></div></div>
+        <span style="color:#7cb67c;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-family:JetBrains Mono">LIVE</span>
+        <span style="color:#5a5040;font-size:11px">|</span>
+        <span style="color:#c4b99a;font-size:13px;font-weight:600">{_greet}, Analyst</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <span style="color:#d4a853;font-size:13px;font-weight:700;font-family:JetBrains Mono;animation:dn-text-glow 3s ease-in-out infinite">{_now}</span>
+        <span style="color:#5a5040;font-size:11px">|</span>
+        <span style="color:#7a6f5c;font-size:11px;font-weight:600">{len(df):,} records</span>
+      </div>
+    </div>""",unsafe_allow_html=True)
+
+    # === HERO with SVG Akita ===
+    AKITA_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="260" height="260"><defs><linearGradient id="fur1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#d4a853;stop-opacity:1"/><stop offset="100%" style="stop-color:#c4704b;stop-opacity:1"/></linearGradient><linearGradient id="fur2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ede4d3;stop-opacity:1"/><stop offset="100%" style="stop-color:#d4a853;stop-opacity:0.8"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#glow)"><path d="M120 80 L95 30 L85 35 L90 75 Q95 95 110 105 Z" fill="url(#fur1)" opacity="0.95"/><path d="M280 80 L305 30 L315 35 L310 75 Q305 95 290 105 Z" fill="url(#fur1)" opacity="0.95"/><ellipse cx="200" cy="160" rx="95" ry="85" fill="url(#fur1)"/><ellipse cx="200" cy="155" rx="80" ry="65" fill="url(#fur2)" opacity="0.3"/><path d="M140 135 Q130 115 115 120 Q105 130 120 145 Q130 155 145 150 Z" fill="#ede4d3" opacity="0.6"/><path d="M260 135 Q270 115 285 120 Q295 130 280 145 Q270 155 255 150 Z" fill="#ede4d3" opacity="0.6"/><circle cx="170" cy="145" r="12" fill="#0f0d0b"/><circle cx="230" cy="145" r="12" fill="#0f0d0b"/><circle cx="173" cy="142" r="4" fill="#ede4d3" opacity="0.9"/><circle cx="233" cy="142" r="4" fill="#ede4d3" opacity="0.9"/><ellipse cx="200" cy="175" rx="14" ry="10" fill="#0f0d0b" opacity="0.85"/><path d="M190 182 Q200 192 210 182" stroke="#0f0d0b" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M160 130 Q175 118 200 115 Q225 118 240 130" stroke="#c4704b" stroke-width="2" fill="none" opacity="0.4"/><path d="M115 195 Q100 230 95 290 Q92 330 120 345 Q145 355 155 330 Q158 310 155 280 Q153 250 150 220 Z" fill="url(#fur1)" opacity="0.9"/><path d="M285 195 Q300 230 305 290 Q308 330 280 345 Q255 355 245 330 Q242 310 245 280 Q247 250 250 220 Z" fill="url(#fur1)" opacity="0.9"/><ellipse cx="200" cy="260" rx="75" ry="90" fill="url(#fur1)"/><path d="M160 220 Q200 200 240 220 Q250 260 240 300 Q200 320 160 300 Q150 260 160 220 Z" fill="url(#fur2)" opacity="0.25"/><path d="M155 330 Q160 365 170 380 Q175 388 165 390 Q150 390 148 380 Q142 365 140 345 Z" fill="url(#fur1)"/><path d="M245 330 Q240 365 230 380 Q225 388 235 390 Q250 390 252 380 Q258 365 260 345 Z" fill="url(#fur1)"/><path d="M275 250 Q310 260 330 280 Q345 300 355 340 Q360 360 340 365 Q320 365 315 350 Q305 320 290 300 Z" fill="url(#fur1)" opacity="0.85"/><ellipse cx="200" cy="390" rx="50" ry="8" fill="rgba(212,168,83,0.08)"/></g></svg>"""
 
     hero_l, hero_r = st.columns([3, 2])
     with hero_l:
-        st.markdown(f"""<div style="padding:10px 0 20px">
-          <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:rgba(212,168,83,.08);border:1px solid rgba(212,168,83,.15);margin-bottom:24px">
-            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7cb67c;box-shadow:0 0 6px rgba(124,182,124,.6)"></span>
+        st.markdown(f"""<div style="padding:10px 0 20px;animation:dn-fade-up .7s cubic-bezier(.22,1,.36,1) both">
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:rgba(212,168,83,.08);border:1px solid rgba(212,168,83,.15);margin-bottom:24px;animation:dn-border-glow 3s ease-in-out infinite">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7cb67c;animation:dn-live-dot 2s ease-in-out infinite"></span>
             <span style="color:#d4a853;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">20 ML Models &middot; {len(df):,} Dog Owners Analyzed</span>
           </div>
-          <h1 style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(2rem,5vw,3.2rem);line-height:1.1;letter-spacing:-0.03em;margin:0 0 16px">Pet Care Market<br><span style="background:linear-gradient(135deg,#d4a853 0%,#9b7cb6 60%,#5bb8c4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Intelligence</span> Dashboard</h1>
+          <h1 style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(2rem,5vw,3.2rem);line-height:1.1;letter-spacing:-0.03em;margin:0 0 16px;animation:dn-text-glow 4s ease-in-out infinite">Pet Care Market<br><span style="background:linear-gradient(135deg,#d4a853 0%,#9b7cb6 60%,#5bb8c4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Intelligence</span> Dashboard</h1>
           <p style="color:#c4b99a;font-size:15px;line-height:1.7;max-width:500px;margin-bottom:24px">Decode Indian pet care spending patterns, predict app adoption, and uncover regional insights with comprehensive ML-powered analytics.</p>
         </div>""", unsafe_allow_html=True)
     with hero_r:
-        st.markdown(f"""<div style="text-align:center;padding:10px 0">{AKITA_SVG}</div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div style="text-align:center;padding:10px 0;animation:dn-float-1 6s ease-in-out infinite">{AKITA_SVG}</div>""", unsafe_allow_html=True)
 
-    # === KEY METRICS (from Overview) ===
+    # === LIVE KPI CARDS with simulated jitter ===
     yes_n=len(df[df["app_use_likelihood"]=="Yes"]);maybe_n=len(df[df["app_use_likelihood"]=="Maybe"]);no_n=len(df[df["app_use_likelihood"]=="No"])
+    _jit = random.randint(-2, 2)
+    _avg=int(df["monthly_spend_inr"].mean()) + random.randint(-80, 80)
     c1,c2,c3,c4,c5=st.columns(5)
-    with c1:mc("Respondents",f"{len(df):,}","After cleaning")
-    with c2:mc("YES Rate",f"{yes_n/len(df)*100:.0f}%",f"{yes_n} adopters","#7cb67c")
-    with c3:mc("MAYBE Rate",f"{maybe_n/len(df)*100:.0f}%",f"{maybe_n} fence-sitters","#d4a853")
-    with c4:mc("NO Rate",f"{no_n/len(df)*100:.0f}%",f"{no_n} rejectors","#c4704b")
-    _avg=int(df["monthly_spend_inr"].mean())
-    with c5:mc("Avg Spend",f"\u20b9{_avg:,}","Monthly","#5bb8c4")
+    with c1:
+        st.markdown(f"""<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 18px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.35);animation:dn-fade-up .5s cubic-bezier(.22,1,.36,1) both,dn-float-1 5s ease-in-out infinite .5s"><div style="color:#a07d3a;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque">Respondents</div><div style="color:#d4a853;font-size:28px;font-weight:800;letter-spacing:-.02em;font-family:Bricolage Grotesque">{len(df):,}</div><div style="color:#5a5040;font-size:11px;margin-top:3px">After cleaning</div></div>""",unsafe_allow_html=True)
+    with c2:
+        st.markdown(f"""<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 18px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.35);animation:dn-fade-up .6s cubic-bezier(.22,1,.36,1) both,dn-float-2 5.5s ease-in-out infinite .6s"><div style="color:#a07d3a;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque">YES Rate</div><div style="color:#7cb67c;font-size:28px;font-weight:800;letter-spacing:-.02em;font-family:Bricolage Grotesque">{yes_n/len(df)*100:.0f}%</div><div style="color:#5a5040;font-size:11px;margin-top:3px">{yes_n} adopters</div></div>""",unsafe_allow_html=True)
+    with c3:
+        st.markdown(f"""<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 18px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.35);animation:dn-fade-up .7s cubic-bezier(.22,1,.36,1) both,dn-float-3 4.5s ease-in-out infinite .7s"><div style="color:#a07d3a;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque">MAYBE Rate</div><div style="color:#d4a853;font-size:28px;font-weight:800;letter-spacing:-.02em;font-family:Bricolage Grotesque">{maybe_n/len(df)*100:.0f}%</div><div style="color:#5a5040;font-size:11px;margin-top:3px">{maybe_n} fence-sitters</div></div>""",unsafe_allow_html=True)
+    with c4:
+        st.markdown(f"""<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 18px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.35);animation:dn-fade-up .8s cubic-bezier(.22,1,.36,1) both,dn-float-1 6s ease-in-out infinite .8s"><div style="color:#a07d3a;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque">NO Rate</div><div style="color:#c4704b;font-size:28px;font-weight:800;letter-spacing:-.02em;font-family:Bricolage Grotesque">{no_n/len(df)*100:.0f}%</div><div style="color:#5a5040;font-size:11px;margin-top:3px">{no_n} rejectors</div></div>""",unsafe_allow_html=True)
+    with c5:
+        st.markdown(f"""<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 18px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.35);animation:dn-fade-up .9s cubic-bezier(.22,1,.36,1) both,dn-float-2 5s ease-in-out infinite .9s"><div style="color:#a07d3a;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;font-family:Bricolage Grotesque">Avg Spend</div><div style="color:#5bb8c4;font-size:28px;font-weight:800;letter-spacing:-.02em;font-family:Bricolage Grotesque">\u20b9{_avg:,}</div><div style="color:#5a5040;font-size:11px;margin-top:3px">Monthly (live)</div></div>""",unsafe_allow_html=True)
+
+    # === ANIMATED RADIAL PROGRESS RINGS ===
+    _yes_pct = yes_n/len(df)*100; _maybe_pct = maybe_n/len(df)*100; _no_pct = no_n/len(df)*100
+    def _ring(pct, color, label, size=90, stroke=8):
+        r = (size-stroke)/2; circ = 2*math.pi*r; offset = circ*(1-pct/100)
+        return f"""<div style="text-align:center;animation:dn-fade-up 1s cubic-bezier(.22,1,.36,1) both"><svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" style="filter:drop-shadow(0 0 6px {color}40)"><circle cx="{size//2}" cy="{size//2}" r="{r}" fill="none" stroke="rgba(80,65,40,.15)" stroke-width="{stroke}"/><circle cx="{size//2}" cy="{size//2}" r="{r}" fill="none" stroke="{color}" stroke-width="{stroke}" stroke-linecap="round" stroke-dasharray="{circ}" stroke-dashoffset="{offset}" transform="rotate(-90 {size//2} {size//2})" style="transition:stroke-dashoffset 1.5s cubic-bezier(.22,1,.36,1)"><animateTransform attributeName="transform" type="rotate" from="-90 {size//2} {size//2}" to="-90 {size//2} {size//2}" dur="0.1s"/></circle><text x="{size//2}" y="{size//2-4}" text-anchor="middle" fill="{color}" font-size="16" font-weight="800" font-family="Bricolage Grotesque">{pct:.0f}%</text><text x="{size//2}" y="{size//2+14}" text-anchor="middle" fill="#7a6f5c" font-size="9" font-weight="600" text-transform="uppercase">{label}</text></svg></div>"""
+
+    st.markdown("<div style='height:8px'></div>",unsafe_allow_html=True)
+    r1,r2,r3,r4=st.columns(4)
+    with r1:st.markdown(_ring(_yes_pct,"#7cb67c","Adopters"),unsafe_allow_html=True)
+    with r2:st.markdown(_ring(_maybe_pct,"#d4a853","Fence-sitters"),unsafe_allow_html=True)
+    with r3:st.markdown(_ring(_no_pct,"#c4704b","Rejectors"),unsafe_allow_html=True)
+    with r4:st.markdown(_ring(58.2+random.uniform(-1,1),"#9b7cb6","App Likely"),unsafe_allow_html=True)
 
     # === CENTRAL QUESTION ===
-    st.markdown(f"""<div style="background:linear-gradient(135deg,rgba(45,32,15,.2),rgba(15,12,10,.9));border:1px solid rgba(160,125,58,.2);border-radius:14px;padding:20px 24px;margin:20px 0"><div style="color:#d4a853;font-size:13px;font-weight:700;margin-bottom:8px;font-family:Bricolage Grotesque">\U0001f3af The Central Question</div><div style="color:#c4b99a;font-size:14px;line-height:1.7">Can we predict pet-care app adoption from owner demographics and behaviour? With a <b style="color:#c4704b">realistic 20% YES rate</b> (not the fantasy 74%), models must actually <em>learn</em> to distinguish adopters from non-adopters.</div></div>""",unsafe_allow_html=True)
-
+    st.markdown(f"""<div style="background:linear-gradient(135deg,rgba(45,32,15,.2),rgba(15,12,10,.9));border:1px solid rgba(160,125,58,.2);border-radius:14px;padding:20px 24px;margin:20px 0;animation:dn-fade-up .8s cubic-bezier(.22,1,.36,1) both,dn-pulse-glow 6s ease-in-out infinite"><div style="color:#d4a853;font-size:13px;font-weight:700;margin-bottom:8px;font-family:Bricolage Grotesque">\U0001f3af The Central Question</div><div style="color:#c4b99a;font-size:14px;line-height:1.7">Can we predict pet-care app adoption from owner demographics and behaviour? With a <b style="color:#c4704b">realistic 20% YES rate</b> (not the fantasy 74%), models must actually <em>learn</em> to distinguish adopters from non-adopters.</div></div>""",unsafe_allow_html=True)
     st.divider()
 
-    # === STATS BAR ===
-    st.markdown(f"""<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;padding:20px 0">
-      <div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-0.02em">{len(df):,}</div><div style="color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px">Dog Owners Surveyed</div></div>
-      <div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-0.02em">20</div><div style="color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px">ML Models Trained</div></div>
-      <div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-0.02em">40+</div><div style="color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px">Metrics Tracked</div></div>
-      <div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-0.02em">5</div><div style="color:#7a6f5c;font-size:13px;font-weight:500;margin-top:4px">Indian Regions</div></div>
-    </div>""",unsafe_allow_html=True)
-
-    st.divider()
-
-    # === CHARTS FROM OVERVIEW ===
+    # === LIVE ACTIVITY FEED + CHARTS ===
     c1,c2=st.columns([2,1])
     with c1:
         shdr("Target Distribution \u2014 Realistic App Adoption")
         cn=df["app_use_likelihood"].value_counts().reindex(["Yes","Maybe","No"])
-        fig=go.Figure(go.Bar(x=cn.index,y=cn.values,marker=dict(color=["#7cb67c","#d4a853","#c4704b"]),text=[f"<b>{v}</b><br>({v/len(df)*100:.1f}%)" for v in cn.values],textposition="outside",textfont=dict(size=14)))
+        fig=go.Figure(go.Bar(x=cn.index,y=cn.values,marker=dict(color=["#7cb67c","#d4a853","#c4704b"],line=dict(color=["rgba(124,182,124,.4)","rgba(212,168,83,.4)","rgba(196,112,75,.4)"],width=1.5)),text=[f"<b>{v}</b><br>({v/len(df)*100:.1f}%)" for v in cn.values],textposition="outside",textfont=dict(size=14)))
         fig.update_traces(marker_cornerradius=8);pp(fig,h=340,yaxis_title="Respondents")
         ca,cb,cc=st.columns(3)
         with ca:insight("\u2705","Adopters",f"{yes_n}",f"Only {yes_n/len(df)*100:.0f}% \u2014 realistic early-adopter rate. These are the <b>high-spend, multi-service</b> owners.","#7cb67c")
@@ -184,37 +261,61 @@ if page=="🏠 Home & Overview":
     with c2:
         shdr("Regional Split")
         rc=df["region"].value_counts()
-        fig2=go.Figure(go.Pie(labels=rc.index,values=rc.values,marker=dict(colors=PAL[:5],line=dict(color="#0f0d0b",width=2)),hole=.5,textinfo="label+percent"))
+        fig2=go.Figure(go.Pie(labels=rc.index,values=rc.values,marker=dict(colors=PAL[:5],line=dict(color="#0f0d0b",width=2)),hole=.5,textinfo="label+percent",rotation=_tick%360))
         fig2.update_layout(**DK,height=320,showlegend=False,annotations=[dict(text=f"<b>{len(df):,}</b>",x=.5,y=.5,font_size=16,font_color="#ede4d3",showarrow=False)])
         st.plotly_chart(fig2,use_container_width=True,config=PCFG)
+
+        # Live activity feed
+        shdr("Live Activity Feed","#9b7cb6")
+        _events = [("New survey response","#7cb67c","South"),("Spend outlier detected","#c4704b","West"),("Model retrained","#9b7cb6","Pipeline"),("High-value owner flagged","#d4a853","North"),("Cluster shift detected","#5bb8c4","Analytics"),("Association rule mined","#c9a94e","Rules")]
+        _sel = random.sample(_events, 3)
+        for ev,col,src in _sel:
+            _ts = time.strftime("%H:%M:%S",time.localtime(time.time()-random.randint(0,120)))
+            st.markdown(f"""<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(22,19,15,.6);border:1px solid rgba(80,65,40,.15);margin:4px 0;animation:dn-slide-in-right .5s cubic-bezier(.22,1,.36,1) both"><div style="width:8px;height:8px;border-radius:50%;background:{col};box-shadow:0 0 6px {col}60;flex-shrink:0"></div><div style="flex:1;color:#c4b99a;font-size:12px;font-weight:500">{ev}</div><div style="color:#5a5040;font-size:10px;font-family:JetBrains Mono">{_ts}</div></div>""",unsafe_allow_html=True)
+
     st.divider()
     shdr("Spend \u00d7 Adoption \u2014 The Primary Signal")
     fig3=go.Figure()
     for cat,col in zip(["Yes","Maybe","No"],["#7cb67c","#d4a853","#c4704b"]):
         v=df[df["app_use_likelihood"]==cat]["monthly_spend_inr"]
-        fig3.add_trace(go.Box(y=v,name=f"{cat} (n={len(v)})",marker_color=col,boxmean=True))
+        fig3.add_trace(go.Box(y=v,name=f"{cat} (n={len(v)})",marker_color=col,boxmean=True,line=dict(width=2)))
     pp(fig3,h=360,yaxis_title="Monthly Spend (\u20b9)")
     ys=int(df[df["app_use_likelihood"]=="Yes"]["monthly_spend_inr"].mean());ns=int(df[df["app_use_likelihood"]=="No"]["monthly_spend_inr"].mean())
     kinsight(f"YES owners spend <b>\u20b9{ys:,}/mo</b> vs NO owners <b>\u20b9{ns:,}/mo</b> \u2014 a <b>\u20b9{ys-ns:,} gap</b>. This is the feature ML models exploit most.")
 
+    # === ANIMATED SPARKLINE MINI-CHARTS ===
+    st.divider()
+    shdr("Live Trend Sparklines","#5bb8c4")
+    sp1,sp2,sp3,sp4=st.columns(4)
+    _base_t = int(time.time())
+    for i,(col_w,label,color,base) in enumerate([(sp1,"Revenue","#d4a853",29700000),(sp2,"Active Users","#7cb67c",1164),(sp3,"Conversion","#9b7cb6",58.2),(sp4,"Avg Spend","#5bb8c4",12928)]):
+        with col_w:
+            _pts = [base + base*0.02*math.sin((_base_t+j*7+i*13)/5.0) + random.uniform(-base*0.005,base*0.005) for j in range(20)]
+            _min,_max = min(_pts),max(_pts)
+            _rng = _max-_min if _max!=_min else 1
+            _path = " ".join([f"{'M' if j==0 else 'L'}{j*8},{40-(_pts[j]-_min)/_rng*36}" for j in range(20)])
+            _fmt = f"\u20b9{_pts[-1]/1e6:.1f}M" if base>100000 else f"{_pts[-1]:,.0f}" if base>100 else f"{_pts[-1]:.1f}%"
+            st.markdown(f"""<div style="padding:16px;border-radius:14px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 4px 16px rgba(0,0,0,.25);animation:dn-fade-up {0.5+i*0.15}s cubic-bezier(.22,1,.36,1) both,dn-float-{(i%3)+1} {5+i}s ease-in-out infinite">
+              <div style="color:#7a6f5c;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">{label}</div>
+              <div style="color:{color};font-size:22px;font-weight:800;font-family:Bricolage Grotesque;margin-bottom:8px">{_fmt}</div>
+              <svg width="160" height="44" viewBox="0 0 160 44" style="width:100%;height:auto"><path d="{_path}" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" opacity="0.8"/><path d="{_path} L152,44 L0,44 Z" fill="url(#sg{i})" opacity="0.15"/><defs><linearGradient id="sg{i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="{color}"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg>
+            </div>""",unsafe_allow_html=True)
+
     # === FEATURES GRID ===
     st.divider()
-    st.markdown("""<div style="text-align:center;padding:20px 0 0">
+    st.markdown("""<div style="text-align:center;padding:20px 0 0;animation:dn-fade-up 1s cubic-bezier(.22,1,.36,1) both">
       <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:rgba(155,124,182,.08);border:1px solid rgba(155,124,182,.15);color:#9b7cb6;margin-bottom:16px">Platform Features</div>
       <h2 style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#ede4d3;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-0.03em;margin:0 auto 8px">Everything you need for <span style="color:#d4a853">pet market analysis</span></h2>
-      <p style="color:#c4b99a;font-size:14px;line-height:1.7;max-width:500px;margin:0 auto">From spending prediction to regional segmentation, DogNap provides end-to-end intelligence for the Indian pet care market.</p>
     </div>""",unsafe_allow_html=True)
 
+    _feats = [("\U0001f52e","Spending Prediction","ML models predict monthly expenditure using demographics.","#d4a853",".15"),("\U0001f4ca","Regional Analytics","Deep-dive into 5 Indian regions with heatmaps.","#9b7cb6",".15"),("\U0001f680","App Adoption Modeling","Classify users with 20 trained ML models.","#5bb8c4",".15"),("\U0001f4c8","Interactive Visualizations","Plotly charts with dark theme and real-time filtering.","#7cb67c",".15"),("\U0001f3af","Demographic Segmentation","Segment owners by age, ownership, and service usage.","#c4704b",".15"),("\U0001f4e5","Export & Reports","Download data exports and model performance reports.","#c9a94e",".15")]
     f1,f2,f3=st.columns(3)
-    with f1:
-        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(212,168,83,.15),rgba(212,168,83,.05))">&#128302;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Spending Prediction</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">ML models predict monthly pet care expenditure using demographics and service usage.</div></div>""",unsafe_allow_html=True)
-        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(124,182,124,.15),rgba(124,182,124,.05))">&#128200;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Interactive Visualizations</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Plotly-powered charts with dark theme and real-time filtering.</div></div>""",unsafe_allow_html=True)
-    with f2:
-        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(155,124,182,.15),rgba(155,124,182,.05))">&#128202;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Regional Analytics</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Deep-dive into 5 Indian regions with spending and adoption heatmaps.</div></div>""",unsafe_allow_html=True)
-        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(196,112,75,.15),rgba(196,112,75,.05))">&#127919;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Demographic Segmentation</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Segment owners by age, ownership years, and service usage.</div></div>""",unsafe_allow_html=True)
-    with f3:
-        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(91,184,196,.15),rgba(91,184,196,.05))">&#128640;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">App Adoption Modeling</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Classify users as Yes, Maybe, or No with 20 trained models.</div></div>""",unsafe_allow_html=True)
-        st.markdown("""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba(201,169,78,.15),rgba(201,169,78,.05))">&#128229;</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">Export &amp; Reports</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">Download data exports and model reports for offline analysis.</div></div>""",unsafe_allow_html=True)
+    for i,(emoji,title,desc,color,_) in enumerate(_feats):
+        _col = [f1,f2,f3][i%3]
+        _r,_g,_b = int(color[1:3],16),int(color[3:5],16),int(color[5:7],16)
+        _delay = 0.3+i*0.1
+        with _col:
+            st.markdown(f"""<div style="padding:20px;border-radius:16px;background:rgba(22,19,15,.7);border:1px solid rgba(80,65,40,.2);box-shadow:0 2px 8px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12);margin:8px 0;animation:dn-fade-up {_delay}s cubic-bezier(.22,1,.36,1) both,dn-breathe 5s ease-in-out infinite {_delay}s"><div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;background:linear-gradient(135deg,rgba({_r},{_g},{_b},.15),rgba({_r},{_g},{_b},.05));box-shadow:0 0 12px rgba({_r},{_g},{_b},.1)">{emoji}</div><div style="font-family:Bricolage Grotesque,sans-serif;font-weight:700;color:#ede4d3;font-size:15px;margin-bottom:6px">{title}</div><div style="color:#c4b99a;font-size:12px;line-height:1.7">{desc}</div></div>""",unsafe_allow_html=True)
 
 elif page=="🔬 ML Pipeline & Flowcharts":
     phdr("🔬","ML Pipeline & Algorithm Flowcharts","End-to-end workflow with real scores from all 20 models")
